@@ -1,0 +1,20 @@
+00000200
+00000012
+addiu 16, 0, 65535
+addiu 17, 0, 65535
+mult 16, 17
+mfhi 0
+mflo 18
+multu 16, 17
+addi 16, 0, 65534
+addi 17, 0, 65534
+mult 16, 17
+multu 16, 17
+mflo 0
+mflo 18
+halt
+halt
+halt
+halt
+halt
+halt
