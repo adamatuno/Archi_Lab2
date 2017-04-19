@@ -6,12 +6,12 @@ void cycle_0() {
     messageReset();
     fprintf(sn, "cycle 0\n");
     for(i = 0; i < 32; ++i) fprintf(sn, "$%02d: 0x%08X\n", i, r[i]);
-    fprintf(sn, "$HI: 0x00000000\n$LO: 0x00000000\nPC: 0x%08X\n\n\n", PC * 4);
+    fprintf(sn, "$HI: 0x00000000\n$LO: 0x00000000\nPC: 0x%08X\n", PC * 4);
 }
 
 void snap(int cycle) {
     int i;
-    fprintf(sn, "cycle %d\n", cycle);
+    if(cycle > 0) fprintf(sn, "cycle %d\n", cycle);
     for(i = 0; i < 32; ++i) {
         if(r[i] != rl[i]) {
             fprintf(sn, "$%02d: 0x%08X\n",i , r[i]);
@@ -30,23 +30,21 @@ void snap(int cycle) {
         fprintf(sn, "PC: 0x%08X\n", PC * 4);
         PCl = PC;
     }
-    fprintf(sn, "IF 0x%08X", IF);
-    printfMIPS(IF);
+    fprintf(sn, "IF: 0x%08X", IF);
     printfIFMessage();
-    fprintf(sn, "ID ");
+    fprintf(sn, "ID: ");
     printfMIPS(ID);
     printfIDMessage();
-    fprintf(sn, "EX ");
+    fprintf(sn, "EX: ");
     printfMIPS(EX);
     printfEXMessage();
-    fprintf(sn, "DM ");
+    fprintf(sn, "DM: ");
     printfMIPS(DM);
     fprintf(sn, "\n");
-    fprintf(sn, "WB ");
+    fprintf(sn, "WB: ");
     printfMIPS(WB);
     messageReset();
-    fprintf(sn, "\n\n");
-
+    fprintf(sn, "\n\n\n");
 }
 
 void messageReset() {
@@ -70,6 +68,7 @@ void printfIDMessage() {
 }
 
 void printfEXMessage() {
+    printf("%d,%d,%d\n", Cycle, EXtoEX, DMtoEX);
     int slash = 0;
     if(EXtoEX > -1 && EXtoEX_case == 1) {
         fprintf(sn, " fwd_EX-EX_rs_$%d", EXtoID);
@@ -209,5 +208,20 @@ void printfMIPS(unsigned int code) {
             default: //wrong
                 break;
             }
+    }
+    else {
+        switch(op){
+            case 0x02://j
+                fprintf(sn, "J");
+                break;
+            case 0x03://jal
+                fprintf(sn, "JAL");
+                break;
+            case 0x3f://halt
+                fprintf(sn, "HALT");
+                break;
+            default:
+                break;
+        }
     }
 }

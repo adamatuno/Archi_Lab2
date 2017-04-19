@@ -30,10 +30,10 @@ void CheckForward() {
             case 0x02: //srl
             case 0x03: //sra
                 if(rS[rt] == 1) { // EXtoEX
-                    EXtoEX = 1;
+                    EXtoEX = rt;
                     EXtoEX_case = 2;
                 }
-                rS[rd] = 1;
+                if(rd != 0) rS[rd] = 1;
                 break;
             case 0x20: //add
             case 0x21: //addu
@@ -44,11 +44,13 @@ void CheckForward() {
             case 0x27: //nor
             case 0x28: //nand
             case 0x2A: //slt
+            case 0x18:///mult
+            case 0x19:///multu
                 if(rS[rs] == 1 || rS[rt] == 1) {
-                    EXtoEX = 1;
+                    EXtoEX = (rS[rs] == 1)? rs : rt;
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
                 }
-                rS[rd] = 1;
+                if(rd != 0) rS[rd] = 1;
                 break;
             default:
                 break;
@@ -68,10 +70,10 @@ void CheckForward() {
             case 0x0E: //nori
             case 0x0A: //slti
                 if(rS[rs] == 1) {
-                    EXtoEX = 1;
+                    EXtoEX = rs;
                     EXtoEX_case = 1;
                 }
-                rS[rt] = 1;
+                if(rt != 0) rS[rt] = 1;
                 break;
             case 0x23: //lw
             case 0x21: //lh
@@ -79,21 +81,21 @@ void CheckForward() {
             case 0x20: //lb
             case 0x24: //lbu
                 if(rS[rs] == 1) {
-                    EXtoEX = 1;
+                    EXtoEX = rs;
                     EXtoEX_case = 1;
                 }
-                rS[rt] = 2;
+                if(rt != 0) rS[rt] = 2;
                 break;
             case 0x04: //beq
             case 0x05: //bne
             case 0x07: //bgtz
                 if(rS[rs] == 1 || rS[rt] == 1) {
-                    EXtoEX = 1;
+                    EXtoEX = (rS[rs] == 1)? rs : rt;
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
                 }
                 break;
             case 0x0F: //lui
-                rS[rt] = 1;
+                if(rt != 0) rS[rt] = 1;
             default:
                 break;
         }

@@ -32,11 +32,11 @@ void ID_stage() {
             case 0x02: //srl
             case 0x03: //sra
                 if(rS[rt] == 1) { // EXtoID
-                    EXtoID = 1;
+                    EXtoID = rt;
                     EXtoID_case = 2;
                 }
                 else if(rS[rt] == 2) { // DMtoEX
-                    DMtoEX = 1;
+                    DMtoEX = rt;
                     DMtoEX_case = 2;
                     stalled = 1;
                     IF_next = IF;
@@ -54,12 +54,14 @@ void ID_stage() {
             case 0x27: //nor
             case 0x28: //nand
             case 0x2A: //slt
+            case 0x18:///mult
+            case 0x19:///multu
                 if(rS[rs] == 1 || rS[rt] == 1) {
-                    EXtoID = 1;
+                    EXtoID = (rS[rs] == 1)? rs : rt;
                     EXtoID_case = (rS[rs] == 1)? 1 : 2;
                 }
                 else if(rS[rs] == 2 || rS[rt] == 2) {
-                    DMtoEX = 1;
+                    DMtoEX = (rS[rs] == 1)? rs : rt;
                     DMtoEX_case = (rS[rs] == 2)? 1 : 2;
                     IF_next = IF;
                     ID_next = ID;
@@ -82,11 +84,11 @@ void ID_stage() {
             case 0x0E: //nori
             case 0x0A: //slti
                 if(rS[rs] == 1) {
-                    EXtoID = 1;
+                    EXtoID = rs;
                     EXtoID_case = 1;
                 }
                 else if(rS[rs] == 2) {
-                    DMtoEX = 1;
+                    DMtoEX = rs;
                     DMtoEX_case = 1;
                     stalled = 1;
                     IF_next = IF;
@@ -100,11 +102,11 @@ void ID_stage() {
             case 0x20: //lb
             case 0x24: //lbu
                 if(rS[rs] == 1) {
-                    EXtoID = 1;
+                    EXtoID = rs;
                     EXtoID_case = 1;
                 }
                 else if(rS[rs] == 2) {
-                    DMtoEX = 1;
+                    DMtoEX = rs;
                     DMtoEX_case = 1;
                     stalled = 1;
                     IF_next = IF;
@@ -117,11 +119,11 @@ void ID_stage() {
             case 0x05: //bne
             case 0x07: //bgtz
                 if(rS[rs] == 1 || rS[rt] == 1) {
-                    EXtoID = 1;
+                    EXtoID = (rS[rs] == 1)? rs : rt;
                     EXtoID_case = (rS[rs] == 1)? 1 : 2;
                 }
                 else if(rS[rs] == 2 || rS[rs] == 2) {
-                    DMtoEX = 1;
+                    DMtoEX = (rS[rs] == 1)? rs : rt;
                     DMtoEX_case = (rS[rs] == 2)? 1 : 2;
                     IF_next = IF;
                     ID_next = ID;

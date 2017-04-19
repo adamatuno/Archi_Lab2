@@ -41,7 +41,7 @@ void init() {
     }
     Hi = Hil = 0x00000000;
     Lo = Lol = 0x00000000;
-    IF = I[0];
+    IF = I[PC];
     ID = EX = DM = WB = 0x00000000;
 }
 
@@ -55,23 +55,24 @@ void next() {
     ++Cycle;
 }
 
+int checkHalt() {
+    if(IF == 0xffffffff && ID == 0xffffffff && EX == 0xffffffff && DM == 0xffffffff && WB == 0xffffffff)  return 1;
+    else return 0;        
+}
+
 int main(){
     int i;
     init();
     cycle_0();
-    Cycle = 1;
-    IF_stage();
-    ID_stage();
-    EX_stage();
-    DM_stage();
-    while(!halt && Cycle <= 500000) {
+    Cycle = 0;
+    while(Cycle <= 500000) {
         WB_stage();
         IF_stage();
         ID_stage();
         EX_stage();
         DM_stage();
-        ++PC;
-        if(!halt) snap(Cycle);
+        snap(Cycle);
+        if(checkHalt()) break;
         next();
     }
 return 0;

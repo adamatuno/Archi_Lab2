@@ -25,12 +25,12 @@ tsn: *.o
 	gcc *.o -o pipeline -O3
 	cp ../testcases/$(case1)/*.bin ../simulator
 	pipeline.exe
-	$(comp) snapshot.rpt ../testcases/$(case1)/snapshot.rpt
 .PHONY: ter
 ter: *.o
 	gcc *.o -o pipeline -O3
 	cp ../testcases/$(case1)/*.bin ../simulator
 	pipeline.exe
+	$(comp) snapshot.rpt ../testcases/$(case1)/snapshot.rpt
 	$(comp) error_dump.rpt ../testcases/$(case1)/error_dump.rpt
 .PHONY: test2
 test2: *.o
