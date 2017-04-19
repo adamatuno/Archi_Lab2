@@ -142,7 +142,7 @@ if(0 == strcmp(op, "/*")) { //µù¸Ñ
     fscanf(f, "%d, %d(%d)", &t, &C, &s);
     write_I(0x28, s, t, C);
 } else if(0 == strcmp(op, "lui")){
-    fscanf(f, "%d, C", &t, &C);
+    fscanf(f, "%d, %d", &t, &C);
     write_I(0x0f, 0, t, C);
 } else if(0 == strcmp(op, "andi")){
     fscanf(f, "%d, %d, %d", &t, &s, &C);
