@@ -3,7 +3,7 @@
 
 fpos_t pos;
 int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32];
-int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case;
+int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case, DMchange;
 unsigned int Hi, Hil, Lo, Lol, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin;
 unsigned int IF, ID, EX, DM, WB, IF_next, ID_next, EX_next, DM_next, WB_next, PC_next, mem_addr;
 FILE *ii, *di, *sn, *err;
@@ -27,6 +27,7 @@ void REX();
 void IEX();
 void JSEX();
 void DM_stage();
+void regSchange();
 void WB_stage();
 //error
 void write_0(unsigned int r);

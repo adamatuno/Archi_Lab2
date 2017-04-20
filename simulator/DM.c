@@ -4,6 +4,7 @@
 void DM_stage() {
     unsigned int op, s, t, C;
     op = get_op(DM);
+    regSchange();
     if(type(op) == 'I') {
         s = get_rs(DM);
         t = get_rt(DM);
@@ -69,5 +70,60 @@ void DM_stage() {
                 break;
         }
     }
+}
 
+void regSchange() {
+    unsigned int op, rs, rt, rd, fun;
+    op = get_op(DM);
+    rs = get_rs(DM);
+    rt = get_rt(DM);
+    fun = get_func(DM);
+    if(type(op) == 'R') {
+        rd = get_rd(DM);
+        switch(fun) {
+            case 0x00: //sll
+                if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
+            case 0x02: //srl
+            case 0x03: //sra
+            case 0x20: //add
+            case 0x21: //addu
+            case 0x22: //sub
+            case 0x24: //and
+            case 0x25: //or
+            case 0x26: //xor
+            case 0x27: //nor
+            case 0x28: //nand
+            case 0x2A: //slt
+            case 0x10: //mfhi
+            case 0x12: //mflo
+                if(rS[rd] == 1) DMchange = rd;
+                break;
+            default:
+                break;
+        }
+    }
+    else if(type(op) == 'I') {
+        switch(op) {
+            case 0x08: //addi
+            case 0x09: //addiu
+            case 0x0C: //andi
+            case 0x0D: //ori
+            case 0x0E: //nori
+            case 0x0A: //slti
+                if(rS[rt] == 1) DMchange = rt;
+                break;
+            case 0x23: //lw
+            case 0x21: //lh
+            case 0x25: //lhu
+            case 0x20: //lb
+            case 0x24: //lbu
+                break;
+            case 0x0F: //lui
+            case 0x04: //beq
+            case 0x05: //bne
+            case 0x07: //bgtz
+            default:
+                break;
+        }
+    }
 }

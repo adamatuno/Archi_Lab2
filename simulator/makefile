@@ -1,5 +1,5 @@
 comp = fc
-case1 = mul_error
+case1 = add3
 case2 = pipeline1
 case3 = pipeline2
 case4 = pipeline3

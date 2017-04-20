@@ -7,11 +7,12 @@ void cycle_0() {
     fprintf(sn, "cycle 0\n");
     for(i = 0; i < 32; ++i) fprintf(sn, "$%02d: 0x%08X\n", i, r[i]);
     fprintf(sn, "$HI: 0x00000000\n$LO: 0x00000000\nPC: 0x%08X\n", PC * 4);
+    //fprintf(sn, "IF: 0x%08X\nID: NOP\nEX: NOP\nDM: NOP\nWB: NOP\n\n\n", IF);
 }
 
 void snap(int cycle) {
     int i;
-    if(cycle > 0) fprintf(sn, "cycle %d\n", cycle);
+    if(Cycle != 0) fprintf(sn, "cycle %d\n", cycle);
     for(i = 0; i < 32; ++i) {
         if(r[i] != rl[i]) {
             fprintf(sn, "$%02d: 0x%08X\n",i , r[i]);
@@ -43,8 +44,8 @@ void snap(int cycle) {
     fprintf(sn, "\n");
     fprintf(sn, "WB: ");
     printfMIPS(WB);
-    messageReset();
     fprintf(sn, "\n\n\n");
+    messageReset();
 }
 
 void messageReset() {
@@ -62,30 +63,16 @@ void printfIFMessage() {
 
 void printfIDMessage() {
     if(stalled) fprintf(sn, " to _be _stalled");
-    if(EXtoID > -1 && EXtoID_case == 1) fprintf(sn, " fwd_DM-WB_rs_$%d", EXtoID);
-    if(EXtoID > -1 && EXtoID_case == 2) fprintf(sn, " fwd_DM-WB_rt_$%d", EXtoID);
+    if(EXtoID > -1 && EXtoID_case == 1) fprintf(sn, " fwd_EX-DM_rs_$%d", EXtoID);
+    if(EXtoID > -1 && EXtoID_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoID);
     fprintf(sn, "\n");
 }
 
-void printfEXMessage() {
-    printf("%d,%d,%d\n", Cycle, EXtoEX, DMtoEX);
-    int slash = 0;
-    if(EXtoEX > -1 && EXtoEX_case == 1) {
-        fprintf(sn, " fwd_EX-EX_rs_$%d", EXtoID);
-        slash = 1;
-    }
-    if(DMtoEX > -1 && DMtoEX_case == 1) {
-        fprintf(sn, " fwd_DM-EX_rs_$%d", EXtoID);
-        slash = 1;
-    }
-    if(EXtoEX > -1 && EXtoEX_case == 2) {
-        if(slash) fprintf(sn, "/");
-        fprintf(sn, " fwd_EX-EX_rt_$%d", EXtoID);
-    }
-    if(DMtoEX > -1 && DMtoEX_case == 2) {
-        if(slash) fprintf(sn, "/");
-        fprintf(sn, " fwd_DM-EX_rt_$%d", EXtoID);
-    }
+void printfEXMessage() {    int slash = 0;
+    if(EXtoEX > -1 && EXtoEX_case == 1) fprintf(sn, " fwd_EX-DM_rs_$%d", EXtoEX);
+    if(DMtoEX > -1 && DMtoEX_case == 1) fprintf(sn, " fwd_DM-WB_rs_$%d", DMtoEX);
+    if(EXtoEX > -1 && EXtoEX_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoEX);
+    if(DMtoEX > -1 && DMtoEX_case == 2) fprintf(sn, " fwd_DM-WB_rt_$%d", DMtoEX);
     fprintf(sn, "\n");
 }
 

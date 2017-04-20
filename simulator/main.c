@@ -41,8 +41,9 @@ void init() {
     }
     Hi = Hil = 0x00000000;
     Lo = Lol = 0x00000000;
-    IF = I[PC];
+    IF = IF_next = I[PC];
     ID = EX = DM = WB = 0x00000000;
+    ID_next = EX_next = DM_next = WB_next = 0x00000000;
 }
 
 void next() {
@@ -65,12 +66,12 @@ int main(){
     init();
     cycle_0();
     Cycle = 0;
-    while(Cycle <= 500000) {
+    while(Cycle <= 20) {
         WB_stage();
-        IF_stage();
-        ID_stage();
-        EX_stage();
         DM_stage();
+        EX_stage();
+        ID_stage();
+        IF_stage();
         snap(Cycle);
         if(checkHalt()) break;
         next();
