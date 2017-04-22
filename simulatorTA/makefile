@@ -3,4 +3,4 @@ case1 = mul_or
 test:
 	cp ../testcases/$(case1)/*.bin ../simulatorTA
 	./pipeline
-	cp ../simulatorTA/*.rpt ../testcases/$case1
+	cp ../simulatorTA/*.rpt ../testcases/$(case1)
