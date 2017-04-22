@@ -35,7 +35,6 @@ void WB_stage() {
                     rS[rd] = 2; 
                     WBchange = rd;
                 }
-                else rS[rd] = 0;
                 r[rd] = rB[rd];
                 break;
             default: // mult, multu
@@ -68,7 +67,6 @@ void WB_stage() {
                 else if(rS[rt] == 4) {
                     WBchange = rt;
                 }
-                else rS[rt] = 0;
                 r[rt] = rB[rt];
                 break;
             case 0x04: //beq

@@ -24,11 +24,12 @@ void ID_stage();
 void STALLED();
 void EX_stage();
 void CheckForward();
+void EXregSchange();
 void REX();
 void IEX();
 void JSEX();
 void DM_stage();
-void regSchange();
+void DMregSchange();
 void WB_stage();
 //error
 void write_0(unsigned int r);

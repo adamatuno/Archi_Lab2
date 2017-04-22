@@ -4,7 +4,7 @@
 void DM_stage() {
     unsigned int op, s, t, C;
     op = get_op(DM);
-    regSchange();
+    DMregSchange();
     if(type(op) == 'I') {
         s = get_rs(DM);
         t = get_rt(DM);
@@ -72,7 +72,7 @@ void DM_stage() {
     }
 }
 
-void regSchange() {
+void DMregSchange() {
     unsigned int op, rs, rt, rd, fun;
     op = get_op(DM);
     rs = get_rs(DM);

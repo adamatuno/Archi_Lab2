@@ -13,6 +13,7 @@ void EX_stage() {
         if(rS[WBchange] == 4) rS[WBchange] = 0;
         WBchange = -1;
     }
+    EXregSchange();
     switch(type(get_op(EX))) {
         case 'R':
             REX(get_func(EX), get_rs(EX), get_rt(EX), get_rd(EX), get_sha(EX));
@@ -53,7 +54,6 @@ void CheckForward() {
                 }/*
                 if(rS[rt] == 3) STALLED();
                 */
-                if(rd != 0) rS[rd] = 1;
                 break;
             case 0x20: //add
             case 0x21: //addu
@@ -71,25 +71,24 @@ void CheckForward() {
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
                     if(rS[rs] == rS[rt]) EXtoEX_case = 3;
                 }
-                if(rS[rs] == 2 || rS[rs] == 4) {
+                if((rS[rs] == 2 || rS[rs] == 4) && rS[rs] == rS[rt]) {
+                    DMtoEX = rs;
+                    DMtoEX_case = 3;
+                    rS[rs] = 0;
+                }
+                else if(rS[rs] == 2 || rS[rs] == 4) {
                     DMtoEX = rs;
                     DMtoEX_case = 1;
                     rS[rs] = 0;
                 }
-                if(rS[rt] == 2 || rS[rt] == 4) {
+                else if(rS[rt] == 2 || rS[rt] == 4) {
                     DMtoEX = rt;
                     DMtoEX_case = 2;
-                    if(rS[rs] == rS[rt]) DMtoEX_case = 3;
                     rS[rt] = 0;
                 }
-                /*
-                if(rS[rs] == 3 || rS[rt] == 3) STALLED();
-                */
-                if(rd != 0) rS[rd] = 1;
                 break;
             case 0x10:
             case 0x12:
-                if(rd != 0) rS[rd] = 1;
             default:
                 break;
         }
@@ -117,7 +116,6 @@ void CheckForward() {
                     DMtoEX_case = 1;
                 }
                 if(rS[rs] == 3) STALLED();
-                if(rt != 0) rS[rt] = 1;
                 break;
             case 0x23: //lw
             case 0x21: //lh
@@ -133,13 +131,85 @@ void CheckForward() {
                     DMtoEX_case = 1;
                 }
                 if(rS[rs] == 3) STALLED();
+                break;
+            case 0x04: //beq
+            case 0x05: //bne
+                if(rS[rs] == 3 || rS[rt] == 3)  STALLED();
+            case 0x07: //bgtz
+            case 0x0F: //lui
+            default:
+                break;
+        }
+    }
+}
+
+
+void EXregSchange() {
+    unsigned int op, fun, rt, rs, rd;
+    op = get_op(EX);
+    fun = get_func(EX);
+    ID_next = IF;
+    EX_next = ID;
+    DM_next = EX;
+    WB_next = DM;
+    if(type(op) == 'R') {
+        rs = get_rs(EX);
+        rt = get_rt(EX);
+        rd = get_rd(EX);
+        switch(fun) {
+            case 0x00: //sll
+                if(rt == 0 && rd == 0 && get_sha(EX) == 0) break; //nop
+            case 0x02: //srl
+            case 0x03: //sra
+                if(rd != 0) rS[rd] = 1;
+                break;
+            case 0x20: //add
+            case 0x21: //addu
+            case 0x22: //sub
+            case 0x24: //and
+            case 0x25: //or
+            case 0x26: //xor
+            case 0x27: //nor
+            case 0x28: //nand
+            case 0x2A: //slt
+            case 0x18:///mult
+            case 0x19:///multu
+                if(rd != 0) rS[rd] = 1;
+                break;
+            case 0x10:
+            case 0x12:
+                if(rd != 0) rS[rd] = 1;
+            default:
+                break;
+        }
+    }
+    else if(type(op) == 'I') {
+        rs = get_rs(EX);
+        rt = get_rt(EX);
+        switch(op) {
+            case 0x2B: //sw
+            case 0x29: //sh
+            case 0x28: //sb
+                //
+            case 0x08: //addi
+            case 0x09: //addiu
+            case 0x0C: //andi
+            case 0x0D: //ori
+            case 0x0E: //nori
+            case 0x0A: //slti
+                if(rt != 0) rS[rt] = 1;
+                break;
+            case 0x23: //lw
+            case 0x21: //lh
+            case 0x25: //lhu
+            case 0x20: //lb
+            case 0x24: //lbu
                 if(rt != 0) rS[rt] = 3;
                 break;
             case 0x0F: //lui
                 if(rt != 0) rS[rt] = 1;
             case 0x04: //beq
             case 0x05: //bne
-                if(rS[rs] == 3 || rS[rt] == 3)  STALLED();
             case 0x07: //bgtz
             default:
                 break;
