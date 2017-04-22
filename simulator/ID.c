@@ -3,7 +3,8 @@
 #include "simulator.h"
 
 void ID_stage() {
-    unsigned int op, fun, rt, rs, rd, C, tt, ss;
+    unsigned int op, fun, rt, rs, rd;
+    int C, tt, ss;
     op = get_op(ID);
     fun = get_func(ID);
     rs = get_rs(ID);
@@ -33,7 +34,6 @@ void ID_stage() {
             case 0x2A: //slt
             case 0x18:///mult
             case 0x19:///multu
-            printf("%d, %d, %d\n",Cycle, rS[rs], rS[rt]);
                 if(rS[rs] == 3 || rS[rt] == 3) STALLED();
                 break;
             default:
@@ -77,6 +77,7 @@ void ID_stage() {
                         EXtoID_case = 2;
                         tt = rB[rt];
                     }
+                    if(rS[rs] == rS[rt]) EXtoID_case = 3;
                 }
                 break;
             case 0x07: //bgtz

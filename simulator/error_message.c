@@ -4,7 +4,7 @@
 
 void write_0(unsigned int r){
     if(r == 0){
-        fprintf(err, "In cycle %d: Write $0 Error\n", Cycle);
+        fprintf(err, "In cycle %d: Write $0 Error\n", Cycle + 3);
     }
 }
 
@@ -23,7 +23,7 @@ void number_overflow(int a, int b, int c){/**c=1 add, c=0 multi **/
 
 void overwrite_HiLo(int rst){
     if(rst) err_overwrite_HiLo = 0;
-    if(err_overwrite_HiLo) fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", Cycle);
+    if(err_overwrite_HiLo) fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", Cycle + 1);
     if(!rst) err_overwrite_HiLo = 1;
 }
 

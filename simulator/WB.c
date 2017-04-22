@@ -29,18 +29,14 @@ void WB_stage() {
             case 0x2A: //slt
             case 0x02: //srl
             case 0x03: //sra
+            case 0x10: //mfhi
+            case 0x12: //mflo
                 if(rS[rd] == 6) {
                     rS[rd] = 2; 
                     WBchange = rd;
                 }
                 else rS[rd] = 0;
                 r[rd] = rB[rd];
-                break;
-            case 0x10: //mfhi
-                r[rd] = Hi;
-                break;
-            case 0x12: //mflo
-                r[rd] = Lo;
                 break;
             default: // mult, multu
                 break;

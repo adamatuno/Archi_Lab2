@@ -27,7 +27,8 @@ unsigned int get_func(unsigned int i) {//6
 }
 
 int get_imm(unsigned int i) {//16
-    return (i & 0x0000ffff);
+    if(0x00008000 & i) return i | 0xffff0000;
+    return i & 0x0000ffff;
 }
 
 int get_addr(unsigned int i) {//26

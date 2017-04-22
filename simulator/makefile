@@ -1,9 +1,9 @@
 comp = fc
-case1 = pipeline3
-case2 = add3
-case3 = pipeline1
+case1 = mul_error
+case2 = pipeline4
+case3 = pipeline3
 case4 = pipeline2
-case5 = pipeline3
+case5 = pipeline1
 pipeline: *.o
 	gcc *.o -o pipeline -O3
 *.o: *.c

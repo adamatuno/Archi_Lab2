@@ -24,7 +24,7 @@ void snap(int cycle) {
         printHi = 0;
     }
     if(printLo) {
-        fprintf(sn, "$HI: 0x%08X\n", Lol);
+        fprintf(sn, "$LO: 0x%08X\n", Lol);
         printLo = 0;
     }
     for(i = 0; i < 32; ++i) {
@@ -76,6 +76,7 @@ void printfIDMessage() {
     if(stalled) fprintf(sn, " to_be_stalled");
     if(EXtoID > -1 && EXtoID_case == 1) fprintf(sn, " fwd_EX-DM_rs_$%d", EXtoID);
     if(EXtoID > -1 && EXtoID_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoID);
+    if(EXtoID > -1 && EXtoID_case == 3) fprintf(sn, " fwd_EX-DM_rs_$%d fwd_EX-DM_rt_$%d", EXtoID, EXtoID);
     fprintf(sn, "\n");
 }
 
@@ -84,6 +85,9 @@ void printfEXMessage() {    int slash = 0;
     if(DMtoEX > -1 && DMtoEX_case == 1) fprintf(sn, " fwd_DM-WB_rs_$%d", DMtoEX);
     if(EXtoEX > -1 && EXtoEX_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoEX);
     if(DMtoEX > -1 && DMtoEX_case == 2) fprintf(sn, " fwd_DM-WB_rt_$%d", DMtoEX);
+
+    if(EXtoEX > -1 && EXtoEX_case == 3) fprintf(sn, " fwd_EX-DM_rs_$%d fwd_EX-DM_rt_$%d", EXtoEX, EXtoEX);
+    if(DMtoEX > -1 && DMtoEX_case == 3) fprintf(sn, " fwd_DM-WB_rs_$%d fwd_DM-WB_rt_$%d", DMtoEX, DMtoEX);
     fprintf(sn, "\n");
 }
 

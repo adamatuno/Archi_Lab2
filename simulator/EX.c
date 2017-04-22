@@ -69,6 +69,7 @@ void CheckForward() {
                 if(rS[rs] == 1 || rS[rt] == 1) {
                     EXtoEX = (rS[rs] == 1)? rs : rt;
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
+                    if(rS[rs] == rS[rt]) EXtoEX_case = 3;
                 }
                 if(rS[rs] == 2 || rS[rs] == 4) {
                     DMtoEX = rs;
@@ -78,6 +79,7 @@ void CheckForward() {
                 if(rS[rt] == 2 || rS[rt] == 4) {
                     DMtoEX = rt;
                     DMtoEX_case = 2;
+                    if(rS[rs] == rS[rt]) DMtoEX_case = 3;
                     rS[rt] = 0;
                 }
                 /*
@@ -85,6 +87,9 @@ void CheckForward() {
                 */
                 if(rd != 0) rS[rd] = 1;
                 break;
+            case 0x10:
+            case 0x12:
+                if(rd != 0) rS[rd] = 1;
             default:
                 break;
         }
@@ -166,7 +171,7 @@ void JSEX(unsigned int op, unsigned int C) {
 void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsigned int C){
     long long t1, t2, temp;
     unsigned long long ull;
-    unsigned int sign, ss, tt;
+    int ss, tt;
     ss = (rS[s] > 0)? rB[s] : r[s];
     tt = (rS[t] > 0)? rB[t] : r[t];
     int n;
@@ -278,7 +283,7 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
 void IEX(unsigned int op, unsigned int s, unsigned int t, int C){
     long long temp;
     unsigned int a, b, c, d, Cu = C & 0x0000ffff;
-    unsigned int sign, ss, tt;
+    int ss, tt;
     ss = (rS[s] > 0)? rB[s] : r[s];
     tt = (rS[t] > 0)? rB[t] : r[t];
     switch(op){
