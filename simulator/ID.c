@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "simulator.h"
+
 void ID_stage() {
     unsigned int op, fun, rt, rs, rd, C, tt, ss;
     op = get_op(ID);
@@ -10,72 +11,16 @@ void ID_stage() {
     C = get_imm(ID);
     ss = r[rs];
     tt = r[rt];
-    if(type(op) == 'I') {
-        switch(op) {
-            case 0x04: //beq
-            case 0x05: //bne
-            printf("%d, %d\n", rS[rs], rS[rt]);
-                if(rS[rs] == 1 || rS[rt] == 1) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
-                else if(rS[rs] == 2 || rS[rt] == 2) {
-                    if(rS[rs] == 2) {
-                        EXtoID = rs;
-                        EXtoID_case = 1;
-                        ss = rB[rs];
-                    }
-                    else {
-                        EXtoID = rt;
-                        EXtoID_case = 2;
-                        tt = rB[rt];
-                    }
-                }
-            case 0x07: //bgtz
-                if(rS[rs] == 1) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
-                else if(rS[rs] == 2) {
-                    EXtoID = rs;
-                    EXtoID_case = 1;
-                    ss = rB[rs];
-                }
-            default:
-                break;
-        }
-    }
-    
-    if(type(op) == 'I' && op == 0x04) { //beq
-        if(ss == tt) PC_next = PC + 1 + C;
-        newIF(PC_next);
-    }
-    else if(type(op) == 'I' && op == 0x05) { //bne
-        if(ss != tt) PC_next = PC + 1 + C;
-        newIF(PC_next);
-    }
-    else if(type(op) == 'I' && op == 0x07) { //bgtz
-        if(ss > 0) PC_next = PC + 1 + C;
-        newIF(PC_next);
-    }
-}
-
-/*
     if(type(op) == 'R') {
+        rs = get_rs(ID);
+        rt = get_rt(ID);
         rd = get_rd(ID);
         switch(fun) {
             case 0x00: //sll
                 if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
             case 0x02: //srl
             case 0x03: //sra
-                if(rS[rt] == 5) { // EXtoID
-                    EXtoID = rt;
-                    EXtoID_case = 2;
-                }
+                if(rS[rt] == 3) STALLED();
                 break;
             case 0x20: //add
             case 0x21: //addu
@@ -88,10 +33,8 @@ void ID_stage() {
             case 0x2A: //slt
             case 0x18:///mult
             case 0x19:///multu
-                if(rS[rs] == 5 || rS[rt] == 5) {
-                    EXtoID = (rS[rs] == 5)? rs : rt;
-                    EXtoID_case = (rS[rs] == 5)? 1 : 2;
-                }
+            printf("%d, %d, %d\n",Cycle, rS[rs], rS[rt]);
+                if(rS[rs] == 3 || rS[rt] == 3) STALLED();
                 break;
             default:
                 break;
@@ -108,34 +51,68 @@ void ID_stage() {
             case 0x0D: //ori
             case 0x0E: //nori
             case 0x0A: //slti
-                if(rS[rs] == 5) {
-                    EXtoID = rs;
-                    EXtoID_case = 1;
-                }
-                break;
             case 0x23: //lw
             case 0x21: //lh
             case 0x25: //lhu
             case 0x20: //lb
             case 0x24: //lbu
-                if(rS[rs] == 5) {
-                    EXtoID = rs;
-                    EXtoID_case = 1;
-                }
+                if(rS[rs] == 3)  STALLED();
                 break;
             case 0x04: //beq
             case 0x05: //bne
-            case 0x07: //bgtz
-                if(rS[rs] == 5 || rS[rt] == 5) {
-                    EXtoID = (rS[rs] == 1)? rs : rt;
-                    EXtoID_case = (rS[rs] == 1)? 1 : 2;
+                if(rS[rs] == 1 || rS[rt] == 1) STALLED();
+                else if(rS[rs] == 3 || rS[rt] == 3) STALLED();
+                else if(rS[rs] == 4 || rS[rt] == 4) {
+                    STALLED();
+                    rS[rs] = 0;
+                }
+                else if(rS[rs] == 2 || rS[rt] == 2 || rS[rs] == 6 || rS[rt] == 6) {
+                    if(rS[rs] == 2 || rS[rs] == 6) {
+                        EXtoID = rs;
+                        EXtoID_case = 1;
+                        ss = rB[rs];
+                    }
+                    else {
+                        EXtoID = rt;
+                        EXtoID_case = 2;
+                        tt = rB[rt];
+                    }
                 }
                 break;
-            case 0x0F: //lui
+            case 0x07: //bgtz
+                if(rS[rs] == 1)  STALLED();
+                if(rS[rs] == 3 || rS[rt] == 3)  STALLED();
+                if(rS[rs] == 2) {
+                    EXtoID = rs;
+                    EXtoID_case = 1;
+                    ss = rB[rs];
+                }
             default:
                 break;
         }
     }
-    */
 
-    
+    if(!stalled) {
+        if(type(op) == 'I' && op == 0x04) { //beq
+            if(ss == tt) PC_next = PC + 1 + C;
+            newIF(PC_next);
+        }
+        else if(type(op) == 'I' && op == 0x05) { //bne
+            if(ss != tt) PC_next = PC + 1 + C;
+            newIF(PC_next);
+        }
+        else if(type(op) == 'I' && op == 0x07) { //bgtz
+            if(ss > 0) PC_next = PC + 1 + C;
+            newIF(PC_next);
+        }
+    }
+}
+
+
+void STALLED() {
+    stalled = 1;
+    IF_next = IF;
+    ID_next = ID;
+    EX_next = 0x00000000;
+    PC_next = PC;
+}

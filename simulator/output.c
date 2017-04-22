@@ -3,34 +3,45 @@
 #include "simulator.h"
 void cycle_0() {
     int i;
+    printReg = -1;
+    printHi = printLo = 0;
     messageReset();
     fprintf(sn, "cycle 0\n");
     for(i = 0; i < 32; ++i) fprintf(sn, "$%02d: 0x%08X\n", i, r[i]);
-    fprintf(sn, "$HI: 0x00000000\n$LO: 0x00000000\nPC: 0x%08X\n", PC * 4);
-    //fprintf(sn, "IF: 0x%08X\nID: NOP\nEX: NOP\nDM: NOP\nWB: NOP\n\n\n", IF);
+    fprintf(sn, "$HI: 0x00000000\n$LO: 0x00000000\n");
 }
 
 void snap(int cycle) {
     int i;
     if(Cycle != 0) fprintf(sn, "cycle %d\n", cycle);
+
+    if(printReg > -1) {
+        fprintf(sn, "$%02d: 0x%08X\n",printReg , rl[printReg]);
+        printReg = -1;
+    }
+    if(printHi) {
+        fprintf(sn, "$HI: 0x%08X\n", Hil);
+        printHi = 0;
+    }
+    if(printLo) {
+        fprintf(sn, "$HI: 0x%08X\n", Lol);
+        printLo = 0;
+    }
     for(i = 0; i < 32; ++i) {
         if(r[i] != rl[i]) {
-            fprintf(sn, "$%02d: 0x%08X\n",i , r[i]);
+            printReg = i;
             rl[i] = r[i];
         }
     }
     if(Hi != Hil) {
-        fprintf(sn, "$HI: 0x%08X\n", Hi);
+        printHi = 1;
         Hil = Hi;
     }
     if(Lo != Lol) {
-        fprintf(sn, "$LO: 0x%08X\n", Lo);
+        printLo = 1;
         Lol = Lo;
     }
-    if(PC != PCl) {
-        fprintf(sn, "PC: 0x%08X\n", PC * 4);
-        PCl = PC;
-    }
+    fprintf(sn, "PC: 0x%08X\n", PC * 4);
     fprintf(sn, "IF: 0x%08X", IF);
     printfIFMessage();
     fprintf(sn, "ID: ");
@@ -56,13 +67,13 @@ void messageReset() {
 }
 
 void printfIFMessage() {
-    if(stalled) fprintf(sn, " to _be _stalled");
-    if(flushed) fprintf(sn, " to _be _flushed");
+    if(stalled) fprintf(sn, " to_be_stalled");
+    if(flushed) fprintf(sn, " to_be_flushed");
     fprintf(sn, "\n");
 }
 
 void printfIDMessage() {
-    if(stalled) fprintf(sn, " to _be _stalled");
+    if(stalled) fprintf(sn, " to_be_stalled");
     if(EXtoID > -1 && EXtoID_case == 1) fprintf(sn, " fwd_EX-DM_rs_$%d", EXtoID);
     if(EXtoID > -1 && EXtoID_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoID);
     fprintf(sn, "\n");

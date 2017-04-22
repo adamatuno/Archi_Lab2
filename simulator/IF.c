@@ -25,7 +25,7 @@ void IF_stage(){
         PC_next = ((((PC + 1) << 2) & 0xf0000000) | (C << 2)) >> 2;
         newIF(PC_next);
     }
-    else {
+    else if(!stalled){
         PC_next = PC + 1;
         newIF(PC_next);
     }

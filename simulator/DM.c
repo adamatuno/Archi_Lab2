@@ -82,7 +82,7 @@ void regSchange() {
         rd = get_rd(DM);
         switch(fun) {
             case 0x00: //sll
-                if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
+                if(rt == 0 && rd == 0 && get_sha(DM) == 0) break; //nop
             case 0x02: //srl
             case 0x03: //sra
             case 0x20: //add
@@ -117,11 +117,15 @@ void regSchange() {
             case 0x25: //lhu
             case 0x20: //lb
             case 0x24: //lbu
+                if(rS[rt] == 3) DMchange = rt;
                 break;
             case 0x0F: //lui
             case 0x04: //beq
             case 0x05: //bne
             case 0x07: //bgtz
+            case 0x2B: //sw
+            case 0x29: //sh
+            case 0x28: //sb
             default:
                 break;
         }

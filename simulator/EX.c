@@ -3,6 +3,15 @@
 #include "simulator.h"
 void EX_stage() {
     CheckForward();
+    if(DMchange > -1) {
+        if(rS[DMchange] == 1) rS[DMchange] = 6;
+        else if(rS[DMchange] == 3) rS[DMchange] = 4;
+        DMchange = -1;
+    }
+    if(WBchange > -1) {
+        if(rS[WBchange] == 2) rS[WBchange] = 0;
+        WBchange = -1;
+    }
     switch(type(get_op(EX))) {
         case 'R':
             REX(get_func(EX), get_rs(EX), get_rt(EX), get_rd(EX), get_sha(EX));
@@ -14,7 +23,6 @@ void EX_stage() {
             IEX(get_op(EX), get_rs(EX), get_rt(EX), get_imm(EX));
             break;
     }
-    if(rS[DMchange] == 1) rS[DMchange] = 2;
 }
 
 void CheckForward() {
@@ -31,7 +39,7 @@ void CheckForward() {
         rd = get_rd(EX);
         switch(fun) {
             case 0x00: //sll
-                if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
+                if(rt == 0 && rd == 0 && get_sha(EX) == 0) break; //nop
             case 0x02: //srl
             case 0x03: //sra
                 if(rS[rt] == 1) { // EXtoEX
@@ -41,13 +49,9 @@ void CheckForward() {
                 if(rS[rt] == 2) { // DMtoEX
                     DMtoEX = rt;
                     DMtoEX_case = 2;
-                }
-                if(rS[rt] == 3) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
+                }/*
+                if(rS[rt] == 3) STALLED();
+                */
                 if(rd != 0) rS[rd] = 1;
                 break;
             case 0x20: //add
@@ -61,21 +65,23 @@ void CheckForward() {
             case 0x2A: //slt
             case 0x18:///mult
             case 0x19:///multu
-            printf("%d,%d\n", rS[rs], rS[rt]);
                 if(rS[rs] == 1 || rS[rt] == 1) {
                     EXtoEX = (rS[rs] == 1)? rs : rt;
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
                 }
-                if(rS[rs] == 2 || rS[rt] == 2) {
-                    DMtoEX = (rS[rs] == 2)? rs : rt;
-                    DMtoEX_case = (rS[rs] == 2)? 1 : 2;
+                if(rS[rs] == 2 || rS[rs] == 4) {
+                    DMtoEX = rs;
+                    DMtoEX_case = 1;
+                    rS[rs] = 0;
                 }
-                if(rS[rs] == 3 || rS[rt] == 3) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
+                if(rS[rt] == 2 || rS[rt] == 4) {
+                    DMtoEX = rt;
+                    DMtoEX_case = 2;
+                    rS[rt] = 0;
                 }
+                /*
+                if(rS[rs] == 3 || rS[rt] == 3) STALLED();
+                */
                 if(rd != 0) rS[rd] = 1;
                 break;
             default:
@@ -83,8 +89,8 @@ void CheckForward() {
         }
     }
     else if(type(op) == 'I') {
-        rs = get_rs(ID);
-        rt = get_rt(ID);
+        rs = get_rs(EX);
+        rt = get_rt(EX);
         switch(op) {
             case 0x2B: //sw
             case 0x29: //sh
@@ -104,12 +110,7 @@ void CheckForward() {
                     DMtoEX = rs;
                     DMtoEX_case = 1;
                 }
-                if(rS[rs] == 3) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
+                if(rS[rs] == 3) STALLED();
                 if(rt != 0) rS[rt] = 1;
                 break;
             case 0x23: //lw
@@ -125,34 +126,15 @@ void CheckForward() {
                     DMtoEX = rs;
                     DMtoEX_case = 1;
                 }
-                if(rS[rs] == 3) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
+                if(rS[rs] == 3) STALLED();
                 if(rt != 0) rS[rt] = 3;
-                break;
-            case 0x04: //beq
-            case 0x05: //bne
-            case 0x07: //bgtz
-                if(rS[rs] == 1 || rS[rt] == 1) {
-                    EXtoEX = (rS[rs] == 1)? rs : rt;
-                    EXtoEX_case = (rS[rs] == 1)? 1 : 2;
-                }
-                if(rS[rs] == 2 || rS[rt] == 2) {
-                    DMtoEX = (rS[rs] == 2)? rs : rt;
-                    DMtoEX_case = (rS[rs] == 2)? 1 : 2;
-                }
-                if(rS[rs] == 3 || rS[rs] == 3) {
-                    stalled = 1;
-                    IF_next = IF;
-                    ID_next = ID;
-                    EX_next = 0x00000000;
-                }
                 break;
             case 0x0F: //lui
                 if(rt != 0) rS[rt] = 1;
+            case 0x04: //beq
+            case 0x05: //bne
+                if(rS[rs] == 3 || rS[rt] == 3)  STALLED();
+            case 0x07: //bgtz
             default:
                 break;
         }
@@ -236,6 +218,7 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
         rB[0] = 0;
         break;
     case 0x00://sll
+        if(t == 0 && d == 0 && C == 0) break; //nop
         write_0(d);
         rB[d] = tt << C;
         rB[0] = 0;

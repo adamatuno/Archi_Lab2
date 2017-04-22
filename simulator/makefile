@@ -1,10 +1,9 @@
 comp = fc
-case1 = add3
-case2 = pipeline1
-case3 = pipeline2
-case4 = pipeline3
-case5 = pipeline4
-case6 = _3
+case1 = pipeline1
+case2 = add3
+case3 = pipeline1
+case4 = pipeline2
+case5 = pipeline3
 pipeline: *.o
 	gcc *.o -o pipeline -O3
 *.o: *.c
@@ -20,13 +19,13 @@ testcase: *.o
 	gcc *.o -o pipeline -O3
 	cp ../testcase/*.bin ../simulator
 	pipeline.exe
-.PHONY: tsn
-tsn: *.o
+.PHONY: run
+run: *.o
 	gcc *.o -o pipeline -O3
 	cp ../testcases/$(case1)/*.bin ../simulator
 	pipeline.exe
-.PHONY: ter
-ter: *.o
+.PHONY: runcomp
+runcomp: *.o
 	gcc *.o -o pipeline -O3
 	cp ../testcases/$(case1)/*.bin ../simulator
 	pipeline.exe
@@ -54,9 +53,4 @@ test2: *.o
 	./pipeline
 	$(comp) snapshot.rpt ../testcases/$(case5)/snapshot.rpt
 	$(comp) error_dump.rpt ../testcases/$(case5)/error_dump.rpt
-	rm -f *.bin *.rpt
-	cp ../testcases/$(case6)/*.bin ../simulator
-	./pipeline
-	$(comp) snapshot.rpt ../testcases/$(case6)/snapshot.rpt
-	$(comp) error_dump.rpt ../testcases/$(case6)/error_dump.rpt
 	rm -f *.bin *.rpt

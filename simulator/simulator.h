@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 fpos_t pos;
-int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32];
-int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case, DMchange;
+int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32], printReg, printHi, printLo;
+int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case, DMchange, WBchange;
 unsigned int Hi, Hil, Lo, Lol, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin;
 unsigned int IF, ID, EX, DM, WB, IF_next, ID_next, EX_next, DM_next, WB_next, PC_next, mem_addr;
 FILE *ii, *di, *sn, *err;
@@ -21,6 +21,7 @@ char type(unsigned int op);
 void newIF();
 void IF_stage();
 void ID_stage();
+void STALLED();
 void EX_stage();
 void CheckForward();
 void REX();

@@ -4,12 +4,12 @@
 
 void WB_stage() {
     unsigned int op, fun, rt, rs, rd;
-    op = get_op(ID);
-    fun = get_func(ID);
+    op = get_op(WB);
+    fun = get_func(WB);
     if(type(op) == 'R') {
-        rs = get_rs(ID);
-        rt = get_rt(ID);
-        rd = get_rd(ID);
+        rs = get_rs(WB);
+        rt = get_rt(WB);
+        rd = get_rd(WB);
         switch(fun) {
             case 0x00:
                 if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
@@ -29,7 +29,11 @@ void WB_stage() {
             case 0x2A: //slt
             case 0x02: //srl
             case 0x03: //sra
-                rS[rd] = 0;
+                if(rS[rd] == 6) {
+                    rS[rd] = 2; 
+                    WBchange = rd;
+                }
+                else rS[rd] = 0;
                 r[rd] = rB[rd];
                 break;
             case 0x10: //mfhi
@@ -43,8 +47,8 @@ void WB_stage() {
         }
     }
     else if(type(op) == 'I') {
-        rs = get_rs(ID);
-        rt = get_rt(ID);
+        rs = get_rs(WB);
+        rt = get_rt(WB);
         switch(op) {
             case 0x08: //addi
             case 0x09: //addiu
@@ -61,8 +65,12 @@ void WB_stage() {
             case 0x20: //lb
             case 0x24: //lbu
             case 0x0F: //lui
+                if(rS[rt] == 6) {
+                    rS[rt] = 2;
+                    WBchange = rt;
+                }
+                else rS[rt] = 0;
                 r[rt] = rB[rt];
-                rS[rt] = 0;
                 break;
             case 0x04: //beq
             case 0x05: //bne
