@@ -1,5 +1,5 @@
 comp = fc
-case1 = pipeline1
+case1 = pipeline3
 case2 = add3
 case3 = pipeline1
 case4 = pipeline2

@@ -10,6 +10,7 @@ void EX_stage() {
     }
     if(WBchange > -1) {
         if(rS[WBchange] == 2) rS[WBchange] = 0;
+        if(rS[WBchange] == 4) rS[WBchange] = 0;
         WBchange = -1;
     }
     switch(type(get_op(EX))) {

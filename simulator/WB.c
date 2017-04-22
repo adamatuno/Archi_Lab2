@@ -69,6 +69,9 @@ void WB_stage() {
                     rS[rt] = 2;
                     WBchange = rt;
                 }
+                else if(rS[rt] == 4) {
+                    WBchange = rt;
+                }
                 else rS[rt] = 0;
                 r[rt] = rB[rt];
                 break;
