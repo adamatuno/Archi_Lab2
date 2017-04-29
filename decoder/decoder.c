@@ -163,7 +163,7 @@ void Iti(unsigned int op, unsigned int s, unsigned int t, int C){
         fprintf(iid, "slti %d, %d, %d\n", t, s, C);
         break;
     case 0x04://beq
-        fprintf(iid, "beq %d, %d, %d\n", t, s, C);
+        fprintf(iid, "beq %d, %d, %d\n", s, t, C);
         break;
     case 0x05://bne
         fprintf(iid, "bne %d, %d, %d\n", t, s, C);

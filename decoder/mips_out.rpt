@@ -1,13 +1,9 @@
-00000270
-0000001b
+00000000
+00000022
 addi 29, 29, 65532
 sw 31, 0(29)
 lw 4, 0(0)
-jal 169
-sw 2, 4(0)
-lw 31, 0(29)
-addi 29, 29, 4
-lw 3, 4(0)
+jal 9
 halt
 halt
 halt
@@ -16,14 +12,25 @@ halt
 slti 8, 4, 2
 beq 0, 8, 2
 or 2, 4, 0
-jr 31
+jr 4
 addi 29, 29, 65528
 sw 31, 4(29)
 sw 4, 0(29)
 addi 4, 4, 65535
-jal 169
-lw 4, 0(29)
-lw 31, 4(29)
-addi 29, 29, 8
-add 2, 2, 4
-jr 31
+addi 4, 0, 65535
+lw 4, 4(0)
+addi 1, 0, 10
+add 0, 4, 1
+or 2, 4, 0
+or 1, 0, 1
+or 1, 1, 1
+or 2, 2, 1
+or 1, 0, 1
+or 3, 1, 2
+or 2, 1, 1
+or 4, 2, 3
+halt
+halt
+halt
+halt
+halt

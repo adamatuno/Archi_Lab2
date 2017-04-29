@@ -57,12 +57,21 @@ void snap(int cycle) {
     fprintf(sn, "WB: ");
     printfMIPS(WB);
     fprintf(sn, "\n\n\n");
+    writeError();
     messageReset();
+}
+
+void writeError() {
+    if(w0 > -1) fprintf(err, "In cycle %d: Write $0 Error\n", w0);
+    if(hlo > -1) fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", hlo);
+    if(dmo > -1) fprintf(err, "In cycle %d: Address Overflow\n", dmo);
+    if(dmm > -1) fprintf(err, "In cycle %d: Misalignment Error\n", dmm);
+    if(no > -1) fprintf(err, "In cycle %d: Number Overflow\n", no);
 }
 
 void messageReset() {
     stalled = 0;
-    EXtoID = EXtoEX = DMtoEX = -1;
+    w0 = no = hlo = dmo = dmm = EXtoID = EXtoEX = DMtoEX = -1;
     EXtoID_case = EXtoEX_case = DMtoEX_case = 0;
 }
 
