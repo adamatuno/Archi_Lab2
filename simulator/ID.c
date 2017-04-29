@@ -36,6 +36,8 @@ void ID_stage() {
             case 0x19:///multu
                 if(rS[rs] == 3 || rS[rt] == 3) STALLED();
                 break;
+            case 0x08: //ja
+
             default:
                 break;
         }
@@ -64,7 +66,8 @@ void ID_stage() {
                 else if(rS[rs] == 3 || rS[rt] == 3) STALLED();
                 else if(rS[rs] == 4 || rS[rt] == 4) {
                     STALLED();
-                    rS[rs] = 0;
+                    rS[rs] = (rS[rs] == 4)? 0 : rS[rs];
+                    rS[rt] = (rS[rt] == 4)? 0 : rS[rt];
                 }
                 else if(rS[rs] == 2 || rS[rt] == 2 || rS[rs] == 6 || rS[rt] == 6) {
                     if(rS[rs] == 2 || rS[rs] == 6) {
@@ -92,19 +95,44 @@ void ID_stage() {
                 break;
         }
     }
-
-    if(!stalled) {
+    if(flushed) flushed = 0;
+    else if(!stalled) {
         if(type(op) == 'I' && op == 0x04) { //beq
-            if(ss == tt) PC_next = PC + 1 + C;
-            newIF(PC_next);
+            if(ss == tt) {
+                PC_next = PC + C;
+                newIF(PC_next);
+                FLUSHED();
+            }
         }
         else if(type(op) == 'I' && op == 0x05) { //bne
-            if(ss != tt) PC_next = PC + 1 + C;
-            newIF(PC_next);
+            if(ss != tt) {
+                PC_next = PC + C;
+                newIF(PC_next);
+                FLUSHED();
+            }
         }
         else if(type(op) == 'I' && op == 0x07) { //bgtz
-            if(ss > 0) PC_next = PC + 1 + C;
+            if(ss > 0) {
+                PC_next = PC + C;
+                newIF(PC_next);
+                FLUSHED();
+            }
+        }
+        else if(type(op) == 'R' && fun == 0x08) { //jr
+            PC_next = ss / 4;
             newIF(PC_next);
+            FLUSHED();
+        }
+        else if(type(op) == 'J' && op == 0x02) { //j
+            PC_next = (((PC << 2) & 0xf0000000) | (C << 2)) >> 2;
+            newIF(PC_next);
+            FLUSHED();
+        }
+        else if(type(op) == 'J' && op == 0x03) { //jal
+            PC_next = (((PC << 2) & 0xf0000000) | (C << 2)) >> 2;
+            R31 = PC * 4;
+            newIF(PC_next);
+            FLUSHED();
         }
     }
 }
@@ -116,4 +144,9 @@ void STALLED() {
     ID_next = ID;
     EX_next = 0x00000000;
     PC_next = PC;
+}
+
+void FLUSHED() {
+    flushed = 1;
+    ID_next = 0x00000000;
 }

@@ -28,7 +28,9 @@ print(f_out, code);
 
 int main(){
 f = fopen("mips.rpt","r");
-f_out = fopen("iimage.bin","w");
+//f = fopen("d.rpt","r");
+f_out = fopen("iimage.bin","wb");
+//f_out = fopen("dimage.bin","wb");
 unsigned int s, t, d, sh, fun, addr, PC, num;
 int C;
 char op[6];
@@ -36,7 +38,16 @@ fscanf(f, "%08x", &PC);
 write(PC);
 fscanf(f, "%08x", &num);
 write(num);
+printf("%d\n", PC);
+printf("%d\n", num);
 int upper = 50;
+/**
+while(num-- && upper--){
+    fscanf(f, "%d", &C);
+    write(C);
+}
+return 0;
+**/
 while(num-- && upper--){
 fscanf(f, "%s", op);
 if(0 == strcmp(op, "/*")) { //µù¸Ñ

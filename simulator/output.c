@@ -12,6 +12,7 @@ void cycle_0() {
 }
 
 void snap(int cycle) {
+    //if(Cycle < 18) de(rB[4], r[4]);
     int i;
     if(Cycle != 0) fprintf(sn, "cycle %d\n", cycle);
 
@@ -60,10 +61,9 @@ void snap(int cycle) {
 }
 
 void messageReset() {
-    stalled = flushed = 0;
+    stalled = 0;
     EXtoID = EXtoEX = DMtoEX = -1;
     EXtoID_case = EXtoEX_case = DMtoEX_case = 0;
- 
 }
 
 void printfIFMessage() {
@@ -89,6 +89,10 @@ void printfEXMessage() {    int slash = 0;
     if(EXtoEX > -1 && EXtoEX_case == 3) fprintf(sn, " fwd_EX-DM_rs_$%d fwd_EX-DM_rt_$%d", EXtoEX, EXtoEX);
     if(DMtoEX > -1 && DMtoEX_case == 3) fprintf(sn, " fwd_DM-WB_rs_$%d fwd_DM-WB_rt_$%d", DMtoEX, DMtoEX);
     fprintf(sn, "\n");
+}
+
+void de(int a, int b) {
+    printf("Cycle: %d, %d, %d\n", Cycle, a, b);
 }
 
 void printfMIPS(unsigned int code) {

@@ -8,24 +8,7 @@ void newIF(int pc) {
 }
 
 void IF_stage(){
-    unsigned int op, fun, rs, C;
-    op = get_op(IF);
-    fun = get_func(IF);
-    rs = get_rs(IF);
-    C = get_imm(IF);
-    if(type(op) == 'R' && fun == 0x08) { //jr
-        PC_next = r[rs] / 4;
-        newIF(PC_next);
-    }
-    else if(type(op) == 'J' && op == 0x02) { //j
-        PC_next = ((((PC + 1) << 2) & 0xf0000000) | (C << 2)) >> 2;
-        newIF(PC_next);
-    }
-    else if(type(op) == 'J' && op == 0x03) { //jal
-        PC_next = ((((PC + 1) << 2) & 0xf0000000) | (C << 2)) >> 2;
-        newIF(PC_next);
-    }
-    else if(!stalled){
+    if(!stalled && !flushed){
         PC_next = PC + 1;
         newIF(PC_next);
     }

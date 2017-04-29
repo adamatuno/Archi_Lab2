@@ -17,7 +17,7 @@ void init() {
     sn = fopen("snapshot.rpt", "wb");
     err = fopen("error_dump.rpt", "wb");
 
-    err_overwrite_HiLo = 0;
+    BIGERROR = bigError = err_overwrite_HiLo = 0;
     PCin = PC = readfile(ii) / 4;
     PCl = PC;
     iin = readfile(ii);
@@ -54,10 +54,11 @@ void next() {
     WB = WB_next;
     PC = PC_next;
     ++Cycle;
+    if(bigError) BIGERROR = 1;
 }
 
 int checkHalt() {
-    if(IF == 0xffffffff && ID == 0xffffffff && EX == 0xffffffff && DM == 0xffffffff && WB == 0xffffffff)  return 1;
+    if(IF == 0xffffffff && ID == 0xffffffff && EX == 0xffffffff && DM == 0xffffffff && WB == 0xffffffff || BIGERROR)  return 1;
     else return 0;        
 }
 
@@ -66,7 +67,7 @@ int main(){
     init();
     cycle_0();
     Cycle = 0;
-    while(Cycle <= 20) {
+    while(Cycle <= 500000) {
         WB_stage();
         DM_stage();
         EX_stage();
@@ -78,3 +79,4 @@ int main(){
     }
 return 0;
 }
+

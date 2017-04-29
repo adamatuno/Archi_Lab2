@@ -1,20 +1,29 @@
-00000200
-00000012
-addiu 16, 0, 65535
-addiu 17, 0, 65535
-mult 16, 17
-mfhi 0
-mflo 18
-multu 16, 17
-addi 16, 0, 65534
-addi 17, 0, 65534
-mult 16, 17
-multu 16, 17
-mflo 0
-mflo 18
+00000270
+0000001b
+addi 29, 29, 65532
+sw 31, 0(29)
+lw 4, 0(0)
+jal 169
+sw 2, 4(0)
+lw 31, 0(29)
+addi 29, 29, 4
+lw 3, 4(0)
 halt
 halt
 halt
 halt
 halt
-halt
+slti 8, 4, 2
+beq 0, 8, 2
+or 2, 4, 0
+jr 31
+addi 29, 29, 65528
+sw 31, 4(29)
+sw 4, 0(29)
+addi 4, 4, 65535
+jal 169
+lw 4, 0(29)
+lw 31, 4(29)
+addi 29, 29, 8
+add 2, 2, 4
+jr 31

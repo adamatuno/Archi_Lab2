@@ -12,7 +12,6 @@ void DM_stage() {
         unsigned int a, b, c, d, Cu = C & 0x0000ffff;
         switch(op) {
             case 0x23://lw
-                write_0(t);
                 if(mem_out(mem_addr, 3)) break;
                 a = D[mem_addr] & 0x000000ff;
                 b = D[mem_addr + 1] & 0x000000ff;
@@ -22,7 +21,6 @@ void DM_stage() {
                 rB[0] = 0;
                 break;
             case 0x21://lh
-                write_0(t);
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr];
                 b = D[mem_addr + 1];
@@ -31,7 +29,6 @@ void DM_stage() {
                 rB[0] = 0;
                 break;
             case 0x25://lhu
-                write_0(t);
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr] & 0x000000ff;
                 b = D[mem_addr + 1] & 0x000000ff;
@@ -39,7 +36,6 @@ void DM_stage() {
                 rB[0] = 0;
                 break;
             case 0x20://lb
-                write_0(t);
                 if(mem_out(mem_addr, 0)) break;
                 a = D[mem_addr] & 0x000000ff;
                 if(a >> 7) rB[t] = a | 0xffffff00;
@@ -47,7 +43,6 @@ void DM_stage() {
                 rB[0] = 0;
                 break;
             case 0x24://lbu
-                write_0(t);
                 if(mem_out(mem_addr, 0)) break;
                 rB[t] = D[mem_addr] & 0x000000ff;
                 rB[0] = 0;
@@ -112,6 +107,10 @@ void DMregSchange() {
             case 0x0A: //slti
                 if(rS[rt] == 1) DMchange = rt;
                 break;
+            case 0x2B: //sw
+            case 0x29: //sh
+            case 0x28: //sb
+                break;
             case 0x23: //lw
             case 0x21: //lh
             case 0x25: //lhu
@@ -123,11 +122,11 @@ void DMregSchange() {
             case 0x04: //beq
             case 0x05: //bne
             case 0x07: //bgtz
-            case 0x2B: //sw
-            case 0x29: //sh
-            case 0x28: //sb
             default:
                 break;
         }
+    }
+    else if(type(op) == 'J' && op == 0x03) { //jal
+        if(rS[31] == 1) DMchange = 31;
     }
 }

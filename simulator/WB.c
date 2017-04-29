@@ -45,11 +45,12 @@ void WB_stage() {
         rs = get_rs(WB);
         rt = get_rt(WB);
         switch(op) {
-            case 0x08: //addi
-            case 0x09: //addiu
             case 0x2B: //sw
             case 0x29: //sh
             case 0x28: //sb
+                break;
+            case 0x08: //addi
+            case 0x09: //addiu
             case 0x0C: //andi
             case 0x0D: //ori
             case 0x0E: //nori
@@ -75,5 +76,15 @@ void WB_stage() {
             default:
                 break;
         }
+    }
+    else if(type(op) == 'J' && op == 0x03) { //jal
+        if(rS[31] == 6) {
+            rS[31] = 2;
+            WBchange = 31;
+        }
+        else if(rS[31] == 4) {
+            WBchange = 31;
+        }
+        r[31] = rB[31];
     }
 }

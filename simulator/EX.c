@@ -51,9 +51,9 @@ void CheckForward() {
                 if(rS[rt] == 2) { // DMtoEX
                     DMtoEX = rt;
                     DMtoEX_case = 2;
-                }/*
+                    rS[rt] = 0;
+                }
                 if(rS[rt] == 3) STALLED();
-                */
                 break;
             case 0x20: //add
             case 0x21: //addu
@@ -86,6 +86,7 @@ void CheckForward() {
                     DMtoEX_case = 2;
                     rS[rt] = 0;
                 }
+                if(rS[rt] == 3) STALLED();
                 break;
             case 0x10:
             case 0x12:
@@ -100,7 +101,15 @@ void CheckForward() {
             case 0x2B: //sw
             case 0x29: //sh
             case 0x28: //sb
-                //
+                if(rS[rt] == 1) {
+                    EXtoEX = rt;
+                    EXtoEX_case = 2;
+                }
+                if(rS[rt] == 2 || rS[rt] == 4) {
+                    DMtoEX = rt;
+                    DMtoEX_case = 2;
+                }
+                if(rS[rt] == 3) STALLED();
             case 0x08: //addi
             case 0x09: //addiu
             case 0x0C: //andi
@@ -111,7 +120,7 @@ void CheckForward() {
                     EXtoEX = rs;
                     EXtoEX_case = 1;
                 }
-                if(rS[rs] == 2) {
+                if(rS[rs] == 2 || rS[rs] == 4) {
                     DMtoEX = rs;
                     DMtoEX_case = 1;
                 }
@@ -126,7 +135,7 @@ void CheckForward() {
                     EXtoEX = rs;
                     EXtoEX_case = 1;
                 }
-                if(rS[rs] == 2) {
+                if(rS[rs] == 2 || rS[rs] == 4) {
                     DMtoEX = rs;
                     DMtoEX_case = 1;
                 }
@@ -176,8 +185,8 @@ void EXregSchange() {
             case 0x19:///multu
                 if(rd != 0) rS[rd] = 1;
                 break;
-            case 0x10:
-            case 0x12:
+            case 0x10: //mfhi
+            case 0x12: //mflo
                 if(rd != 0) rS[rd] = 1;
             default:
                 break;
@@ -190,6 +199,7 @@ void EXregSchange() {
             case 0x2B: //sw
             case 0x29: //sh
             case 0x28: //sb
+                break;
                 //
             case 0x08: //addi
             case 0x09: //addiu
@@ -215,18 +225,16 @@ void EXregSchange() {
                 break;
         }
     }
+    else if(type(op) == 'J' && op == 0x03) { //jal
+        rS[31] = 1;
+    }
 }
 
 void JSEX(unsigned int op, unsigned int C) {
     switch(op){
     case 0x02://j
-        PC_next = ((((PC + 1) << 2) & 0xf0000000) | (C << 2)) >> 2;
-        PC_overflow();
-        break;
     case 0x03://jal
-        r[31] = PC << 2;
-        PC_next = ((((PC + 1) << 2) & 0xf0000000) | (C << 2)) >> 2;
-        PC_overflow();
+        rB[31] = R31;
         break;
     case 0x3f://halt
         halt = 1;
@@ -310,7 +318,6 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
         rB[0] = 0;
         break;
     case 0x08://jr
-        PC = ss / 4;
         PC_overflow();
         break;
     case 0x18:///mult
@@ -447,19 +454,8 @@ void IEX(unsigned int op, unsigned int s, unsigned int t, int C){
         rB[0] = 0;
         break;
     case 0x04://beq
-        number_overflow(PC*4, 4*C+4, 1);
-        PC_overflow();
-        if(ss == tt) PC = PC + C;
-        break;
     case 0x05://bne
-        number_overflow(PC*4, 4*C+4, 1);
-        PC_overflow();
-        if(ss != tt) PC = PC + C;
-        break;
     case 0x07://bgtz
-        number_overflow(PC*4, 4*C+4, 1);
-        PC_overflow();
-        if(ss > 0) PC = PC + C;
         break;
     default:
         halt = 1;

@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 fpos_t pos;
-int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32], printReg, printHi, printLo;
+int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32], printReg, printHi, printLo, bigError, BIGERROR;
 int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case, DMchange, WBchange;
-unsigned int Hi, Hil, HiB, Lo, Lol, LoB, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin;
+unsigned int Hi, Hil, HiB, Lo, Lol, LoB, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin, R31;
 unsigned int IF, ID, EX, DM, WB, IF_next, ID_next, EX_next, DM_next, WB_next, PC_next, mem_addr;
 FILE *ii, *di, *sn, *err;
 //decode
@@ -22,6 +22,7 @@ void newIF();
 void IF_stage();
 void ID_stage();
 void STALLED();
+void FLUSHED();
 void EX_stage();
 void CheckForward();
 void EXregSchange();
@@ -48,4 +49,6 @@ void printfIFMessage();
 void printfIDMessage();
 void printfEXMessage();
 void printfMIPS(unsigned int code);
+//debug
+void de(int a, int b);
 
