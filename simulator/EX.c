@@ -241,6 +241,7 @@ void JSEX(unsigned int op, unsigned int C) {
         break;
     default:
         halt = 1;
+        bigError = 1;
         printf("illegal instruction found at 0x%08x",PC * 4 - 4);
         break;
     }
@@ -351,6 +352,7 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
         break;
     default:
         halt = 1;
+        bigError = 1;
         printf("illegal instruction found at 0x%08x",PC * 4 - 4);
         break;
     }
@@ -413,17 +415,20 @@ void IEX(unsigned int op, unsigned int s, unsigned int t, int C){
         mem_overflow(ss + C, 3);
         data_misaligned(ss + C, 1);
         mem_addr = ss + C;
+        rDB[t] = tt;
         break;
     case 0x29://sh
         number_overflow(ss, C, 1);
         mem_overflow(ss + C, 1);
         data_misaligned(ss + C, 0);
         mem_addr = ss + C;
+        rDB[t] = tt;
         break;
     case 0x28://sb
         number_overflow(ss, C, 0);
         mem_overflow(ss + C, 0);
         mem_addr = ss + C;
+        rDB[t] = tt;
         break;
     case 0x0f:///lui
         write_0(t);
@@ -459,6 +464,7 @@ void IEX(unsigned int op, unsigned int s, unsigned int t, int C){
         break;
     default:
         halt = 1;
+        bigError = 1;
         printf("illegal instruction found at 0x%08x",PC * 4 - 4);
         break;
     }

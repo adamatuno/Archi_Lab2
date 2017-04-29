@@ -12,7 +12,6 @@ void cycle_0() {
 }
 
 void snap(int cycle) {
-    //if(Cycle < 18) de(rB[4], r[4]);
     int i;
     if(Cycle != 0) fprintf(sn, "cycle %d\n", cycle);
 
@@ -61,17 +60,36 @@ void snap(int cycle) {
     messageReset();
 }
 
+
 void writeError() {
-    if(w0 > -1) fprintf(err, "In cycle %d: Write $0 Error\n", w0);
-    if(hlo > -1) fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", hlo);
-    if(dmo > -1) fprintf(err, "In cycle %d: Address Overflow\n", dmo);
-    if(dmm > -1) fprintf(err, "In cycle %d: Misalignment Error\n", dmm);
-    if(no > -1) fprintf(err, "In cycle %d: Number Overflow\n", no);
+    if(w0 > 0 && w0B == Cycle) {
+        fprintf(err, "In cycle %d: Write $0 Error\n", w0);
+        w0 = -1;
+    }
+    if(hlo > 0 && hloB == Cycle) {
+        fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", hlo);
+        hlo = -1;
+    }
+    if(dmo > 0 && dmo == Cycle) {
+        fprintf(err, "In cycle %d: Address Overflow\n", dmo);
+        dmo = -1;
+    }
+    if(dmm > 0 && dmm == Cycle) {
+        fprintf(err, "In cycle %d: Misalignment Error\n", dmm);
+        dmm = -1;
+    }
+    if(no > 0 && noB == Cycle) {
+        fprintf(err, "In cycle %d: Number Overflow\n", no);
+        no = -1;
+    }
+    if(w0 > 0) w0B = w0;
+    if(hlo > 0) hloB = hlo;
+    if(no > 0) noB = no;
 }
 
 void messageReset() {
     stalled = 0;
-    w0 = no = hlo = dmo = dmm = EXtoID = EXtoEX = DMtoEX = -1;
+    EXtoID = EXtoEX = DMtoEX = -1;
     EXtoID_case = EXtoEX_case = DMtoEX_case = 0;
 }
 

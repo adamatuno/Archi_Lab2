@@ -17,51 +17,56 @@ void DM_stage() {
                 b = D[mem_addr + 1] & 0x000000ff;
                 c = D[mem_addr + 2] & 0x000000ff;
                 d = D[mem_addr + 3] & 0x000000ff;
-                rB[t] = (a << 24) | (b << 16) | (c << 8) | d;
-                rB[0] = 0;
+                rDB[t] = (a << 24) | (b << 16) | (c << 8) | d;
+                rDB[0] = 0;
+                rB[t] = rDB[t];
                 break;
             case 0x21://lh
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr];
                 b = D[mem_addr + 1];
-                if(a >> 7) rB[t] = ((a << 8) | b) | 0xffff0000;
-                else rB[t] = ((a << 8) | b) & 0x0000ffff;
-                rB[0] = 0;
+                if(a >> 7) rDB[t] = ((a << 8) | b) | 0xffff0000;
+                else rDB[t] = ((a << 8) | b) & 0x0000ffff;
+                rDB[0] = 0;
+                rB[t] = rDB[t];
                 break;
             case 0x25://lhu
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr] & 0x000000ff;
                 b = D[mem_addr + 1] & 0x000000ff;
-                rB[t] = ((a << 8) | b) & 0x0000ffff;
-                rB[0] = 0;
+                rDB[t] = ((a << 8) | b) & 0x0000ffff;
+                rDB[0] = 0;
+                rB[t] = rDB[t];
                 break;
             case 0x20://lb
                 if(mem_out(mem_addr, 0)) break;
                 a = D[mem_addr] & 0x000000ff;
-                if(a >> 7) rB[t] = a | 0xffffff00;
-                else rB[t] = a;
-                rB[0] = 0;
+                if(a >> 7) rDB[t] = a | 0xffffff00;
+                else rDB[t] = a;
+                rDB[0] = 0;
+                rB[t] = rDB[t];
                 break;
             case 0x24://lbu
                 if(mem_out(mem_addr, 0)) break;
-                rB[t] = D[mem_addr] & 0x000000ff;
-                rB[0] = 0;
+                rDB[t] = D[mem_addr] & 0x000000ff;
+                rDB[0] = 0;
+                rB[t] = rDB[t];
                 break;
             case 0x2b://sw
                 if(mem_out(mem_addr, 3)) break;
-                D[mem_addr] = (r[t] >> 24) & 0x000000ff;
-                D[mem_addr + 1] = (r[t] >> 16) & 0x000000ff;
-                D[mem_addr + 2] = (r[t] >> 8) & 0x000000ff;
-                D[mem_addr + 3] = r[t] & 0x000000ff;
+                D[mem_addr] = (rDB[t] >> 24) & 0x000000ff;
+                D[mem_addr + 1] = (rDB[t] >> 16) & 0x000000ff;
+                D[mem_addr + 2] = (rDB[t] >> 8) & 0x000000ff;
+                D[mem_addr + 3] = rDB[t] & 0x000000ff;
                 break;
             case 0x29://sh
                 if(mem_out(mem_addr, 1)) break;
-                D[mem_addr] = (r[t] >> 8) & 0x000000ff;
-                D[mem_addr + 1] = r[t] & 0x000000ff;
+                D[mem_addr] = (rDB[t] >> 8) & 0x000000ff;
+                D[mem_addr + 1] = rDB[t] & 0x000000ff;
                 break;
             case 0x28://sb
                 if(mem_out(mem_addr, 0)) break;
-                D[mem_addr] = r[t] & 0x000000ff;
+                D[mem_addr] = rDB[t] & 0x000000ff;
                 break;
         }
     }
@@ -91,6 +96,7 @@ void DMregSchange() {
             case 0x2A: //slt
             case 0x10: //mfhi
             case 0x12: //mflo
+                rDB[rd] = rB[rd];
                 if(rS[rd] == 1) DMchange = rd;
                 break;
             default:
@@ -105,6 +111,7 @@ void DMregSchange() {
             case 0x0D: //ori
             case 0x0E: //nori
             case 0x0A: //slti
+                rDB[rt] = rB[rt];
                 if(rS[rt] == 1) DMchange = rt;
                 break;
             case 0x2B: //sw

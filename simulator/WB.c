@@ -35,7 +35,7 @@ void WB_stage() {
                     rS[rd] = 2; 
                     WBchange = rd;
                 }
-                r[rd] = rB[rd];
+                r[rd] = rDB[rd];
                 break;
             default: // mult, multu
                 break;
@@ -49,17 +49,26 @@ void WB_stage() {
             case 0x29: //sh
             case 0x28: //sb
                 break;
+            case 0x23: //lw
+            case 0x21: //lh
+            case 0x25: //lhu
+            case 0x20: //lb
+            case 0x24: //lbu
+                if(rS[rt] == 6) {
+                    rS[rt] = 2;
+                    WBchange = rt;
+                }
+                else if(rS[rt] == 4) {
+                    WBchange = rt;
+                }
+                r[rt] = rDB[rt];
+                break;
             case 0x08: //addi
             case 0x09: //addiu
             case 0x0C: //andi
             case 0x0D: //ori
             case 0x0E: //nori
             case 0x0A: //slti
-            case 0x23: //lw
-            case 0x21: //lh
-            case 0x25: //lhu
-            case 0x20: //lb
-            case 0x24: //lbu
             case 0x0F: //lui
                 if(rS[rt] == 6) {
                     rS[rt] = 2;
@@ -68,7 +77,7 @@ void WB_stage() {
                 else if(rS[rt] == 4) {
                     WBchange = rt;
                 }
-                r[rt] = rB[rt];
+                r[rt] = rDB[rt];
                 break;
             case 0x04: //beq
             case 0x05: //bne

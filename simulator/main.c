@@ -37,7 +37,7 @@ void init() {
     for(i = din * 4; i < 1024; ++i) D[i] = 0x00000000;
     for(i = 0; i < 32; ++i) {
         rS[i] = 0;
-        if(i != 29) r[i] = rl[i] = rB[i] = 0x00000000;
+        if(i != 29) r[i] = rl[i] = rB[i] = rDB[i] = 0x00000000;
     }
     Hi = Hil = 0x00000000;
     Lo = Lol = 0x00000000;

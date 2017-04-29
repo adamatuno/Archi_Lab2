@@ -2,12 +2,12 @@
 #include <stdlib.h>
 
 fpos_t pos;
-int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32], printReg, printHi, printLo, bigError, BIGERROR;
+int r[32], rl[32], Cycle, err_overwrite_HiLo, rS[32], rB[32], rDB[32], printReg, printHi, printLo, bigError, BIGERROR;
 int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_case, DMchange, WBchange;
 unsigned int Hi, Hil, HiB, Lo, Lol, LoB, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin, R31;
 unsigned int IF, ID, EX, DM, WB, IF_next, ID_next, EX_next, DM_next, WB_next, PC_next, mem_addr;
 FILE *ii, *di, *sn, *err;
-int w0, no, hlo, dmo, dmm;
+int w0, no, hlo, dmo, dmm, hloB, noB, w0B;
 //decode
 unsigned int get_op(unsigned int i);
 unsigned int get_rs(unsigned int i);
