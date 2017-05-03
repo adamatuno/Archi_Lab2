@@ -12,6 +12,8 @@ void DM_stage() {
         unsigned int a, b, c, d, Cu = C & 0x0000ffff;
         switch(op) {
             case 0x23://lw
+                mem_overflow(mem_addr, 3);
+                data_misaligned(mem_addr, 1);
                 if(mem_out(mem_addr, 3)) break;
                 a = D[mem_addr] & 0x000000ff;
                 b = D[mem_addr + 1] & 0x000000ff;
@@ -22,6 +24,8 @@ void DM_stage() {
                 rB[t] = rDB[t];
                 break;
             case 0x21://lh
+                mem_overflow(mem_addr, 1);
+                data_misaligned(mem_addr, 0);
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr];
                 b = D[mem_addr + 1];
@@ -31,6 +35,8 @@ void DM_stage() {
                 rB[t] = rDB[t];
                 break;
             case 0x25://lhu
+                mem_overflow(mem_addr, 1);
+                data_misaligned(mem_addr, 0);
                 if(mem_out(mem_addr, 1)) break;
                 a = D[mem_addr] & 0x000000ff;
                 b = D[mem_addr + 1] & 0x000000ff;
@@ -39,6 +45,7 @@ void DM_stage() {
                 rB[t] = rDB[t];
                 break;
             case 0x20://lb
+                mem_overflow(mem_addr, 0);
                 if(mem_out(mem_addr, 0)) break;
                 a = D[mem_addr] & 0x000000ff;
                 if(a >> 7) rDB[t] = a | 0xffffff00;
@@ -47,12 +54,15 @@ void DM_stage() {
                 rB[t] = rDB[t];
                 break;
             case 0x24://lbu
+                mem_overflow(mem_addr, 0);
                 if(mem_out(mem_addr, 0)) break;
                 rDB[t] = D[mem_addr] & 0x000000ff;
                 rDB[0] = 0;
                 rB[t] = rDB[t];
                 break;
             case 0x2b://sw
+                mem_overflow(mem_addr, 3);
+                data_misaligned(mem_addr, 1);
                 if(mem_out(mem_addr, 3)) break;
                 D[mem_addr] = (rDB[t] >> 24) & 0x000000ff;
                 D[mem_addr + 1] = (rDB[t] >> 16) & 0x000000ff;
@@ -60,11 +70,14 @@ void DM_stage() {
                 D[mem_addr + 3] = rDB[t] & 0x000000ff;
                 break;
             case 0x29://sh
+                mem_overflow(mem_addr, 1);
+                data_misaligned(mem_addr, 0);
                 if(mem_out(mem_addr, 1)) break;
                 D[mem_addr] = (rDB[t] >> 8) & 0x000000ff;
                 D[mem_addr + 1] = rDB[t] & 0x000000ff;
                 break;
             case 0x28://sb
+                mem_overflow(mem_addr, 0);
                 if(mem_out(mem_addr, 0)) break;
                 D[mem_addr] = rDB[t] & 0x000000ff;
                 break;
@@ -111,6 +124,7 @@ void DMregSchange() {
             case 0x0D: //ori
             case 0x0E: //nori
             case 0x0A: //slti
+            case 0x0F: //lui
                 rDB[rt] = rB[rt];
                 if(rS[rt] == 1) DMchange = rt;
                 break;
@@ -125,7 +139,6 @@ void DMregSchange() {
             case 0x24: //lbu
                 if(rS[rt] == 3) DMchange = rt;
                 break;
-            case 0x0F: //lui
             case 0x04: //beq
             case 0x05: //bne
             case 0x07: //bgtz
@@ -134,6 +147,7 @@ void DMregSchange() {
         }
     }
     else if(type(op) == 'J' && op == 0x03) { //jal
+        rDB[31] = rB[31];
         if(rS[31] == 1) DMchange = 31;
     }
 }

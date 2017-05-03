@@ -48,7 +48,7 @@ void CheckForward() {
                     EXtoEX = rt;
                     EXtoEX_case = 2;
                 }
-                if(rS[rt] == 2) { // DMtoEX
+                if(rS[rt] == 2 || rS[rt] == 4) { // DMtoEX
                     DMtoEX = rt;
                     DMtoEX_case = 2;
                     rS[rt] = 0;
@@ -71,7 +71,7 @@ void CheckForward() {
                     EXtoEX_case = (rS[rs] == 1)? 1 : 2;
                     if(rS[rs] == rS[rt]) EXtoEX_case = 3;
                 }
-                if((rS[rs] == 2 || rS[rs] == 4) && rS[rs] == rS[rt]) {
+                if((rS[rs] == 2 || rS[rs] == 4) && rs == rt) {
                     DMtoEX = rs;
                     DMtoEX_case = 3;
                     rS[rs] = 0;
@@ -101,15 +101,29 @@ void CheckForward() {
             case 0x2B: //sw
             case 0x29: //sh
             case 0x28: //sb
-                if(rS[rt] == 1) {
-                    EXtoEX = rt;
-                    EXtoEX_case = 2;
+                if(rS[rs] == 1 || rS[rt] == 1) {
+                    EXtoEX = (rS[rs] == 1)? rs : rt;
+                    EXtoEX_case = (rS[rs] == 1)? 1 : 2;
+                    if(rs == rt) EXtoEX_case = 3;
                 }
-                if(rS[rt] == 2 || rS[rt] == 4) {
+                if((rS[rs] == 2 || rS[rs] == 4) && rs == rt) {
+                    DMtoEX = rs;
+                    DMtoEX_case = 3;
+                    rS[rs] = 0;
+                    rS[rt] = 0;
+                }
+                else if(rS[rs] == 2 || rS[rs] == 4) {
+                    DMtoEX = rs;
+                    DMtoEX_case = 1;
+                    rS[rs] = 0;
+                }
+                else if(rS[rt] == 2 || rS[rt] == 4) {
                     DMtoEX = rt;
                     DMtoEX_case = 2;
+                    rS[rt] = 0;
                 }
                 if(rS[rt] == 3) STALLED();
+                break;
             case 0x08: //addi
             case 0x09: //addiu
             case 0x0C: //andi
@@ -181,14 +195,14 @@ void EXregSchange() {
             case 0x27: //nor
             case 0x28: //nand
             case 0x2A: //slt
-            case 0x18:///mult
-            case 0x19:///multu
                 if(rd != 0) rS[rd] = 1;
                 break;
             case 0x10: //mfhi
             case 0x12: //mflo
                 if(rd != 0) rS[rd] = 1;
             default:
+            case 0x18:///mult
+            case 0x19:///multu
                 break;
         }
     }
@@ -256,65 +270,53 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
     int n;
     switch(func){
     case 0x20:///add
-        write_0(d);
         number_overflow(ss, tt, 1);
         rB[d] = ss + tt;
         rB[0] = 0;
         break;
     case 0x21:///addu
-        write_0(d);
         rB[d] = ss + tt;
         rB[0] = 0;
         break;
     case 0x22:///sub
-        write_0(d);
         number_overflow(ss, -tt, 1);
         rB[d] = ss - tt;
         rB[0] = 0;
         break;
     case 0x24://and
-        write_0(d);
         rB[d] = ss & tt;
         rB[0] = 0;
         break;
     case 0x25://or
-        write_0(d);
         rB[d] = ss | tt;
         rB[0] = 0;
         break;
     case 0x26://xor
-        write_0(d);
         rB[d] = ss ^ tt;
         rB[0] = 0;
         break;
     case 0x27://nor
-        write_0(d);
         rB[d] = ~(ss | tt);
         rB[0] = 0;
         break;
     case 0x28://nand
-        write_0(d);
         rB[d] = ~(ss & tt);
         rB[0] = 0;
         break;
     case 0x2a://slt
-        write_0(d);
         rB[d] = ss < tt;
         rB[0] = 0;
         break;
     case 0x00://sll
         if(t == 0 && d == 0 && C == 0) break; //nop
-        write_0(d);
         rB[d] = tt << C;
         rB[0] = 0;
         break;
     case 0x02://srl
-        write_0(d);
         rB[d] = (unsigned int)tt >> C;
         rB[0] = 0;
         break;
     case 0x03://sra
-        write_0(d);
         rB[d] = tt >> C;
         rB[0] = 0;
         break;
@@ -339,13 +341,11 @@ void REX(unsigned int func, unsigned int s, unsigned int t, unsigned int d, unsi
         Lo = (int) (ull & 0x00000000ffffffff);
         break;
     case 0x10://mfhi
-        write_0(d);
         overwrite_HiLo(1);
         rB[d] = Hi;
         rB[0] = 0;
         break;
     case 0x12://mflo
-        write_0(d);
         overwrite_HiLo(1);
         rB[d] = Lo;
         rB[0] = 0;
@@ -367,94 +367,69 @@ void IEX(unsigned int op, unsigned int s, unsigned int t, int C){
     tt = (rS[t] > 0)? rB[t] : r[t];
     switch(op){
     case 0x08://addi
-        write_0(t);
         number_overflow(ss, C, 1);
         rB[t] = ss + C;
         rB[0] = 0;
         break;
     case 0x09://addiu
-        write_0(t);
         rB[t] = ss + C;
         rB[0] = 0;
         break;
     case 0x23://lw
-        write_0(t);
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 3);
-        data_misaligned(ss + C, 1);
         mem_addr = ss + C;
         break;
     case 0x21://lh
-        write_0(t);
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 1);
-        data_misaligned(ss + C, 0);
         mem_addr = ss + C;
         break;
     case 0x25://lhu
-        write_0(t);
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 1);
-        data_misaligned(ss + C, 0);
         mem_addr = ss + C;
         break;
     case 0x20://lb
-        write_0(t);
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 0);
         mem_addr = ss + C;
         break;
     case 0x24://lbu
-        write_0(t);
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 0);
         mem_addr = ss + C;
         break;
     case 0x2b://sw
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 3);
-        data_misaligned(ss + C, 1);
         mem_addr = ss + C;
         rDB[t] = tt;
         break;
     case 0x29://sh
         number_overflow(ss, C, 1);
-        mem_overflow(ss + C, 1);
-        data_misaligned(ss + C, 0);
         mem_addr = ss + C;
         rDB[t] = tt;
         break;
     case 0x28://sb
-        number_overflow(ss, C, 0);
-        mem_overflow(ss + C, 0);
+        number_overflow(ss, C, 1);
         mem_addr = ss + C;
         rDB[t] = tt;
         break;
     case 0x0f:///lui
-        write_0(t);
         rB[t] = Cu << 16;
         rB[0] = 0;
         break;
     case 0x0c:///andi
-        write_0(t);
         a = ss;
         rB[t] = a & Cu;
         rB[0] = 0;
         break;
     case 0x0d:///ori
-        write_0(t);
         a = ss;
         rB[t] = ss | Cu;
         rB[0] = 0;
         break;
     case 0x0e:///nori
-        write_0(t);
         a = ss;
         rB[t] = ~(a | Cu);
         rB[0] = 0;
         break;
     case 0x0a://slti
-        write_0(t);
         rB[t] = ss < C;
         rB[0] = 0;
         break;

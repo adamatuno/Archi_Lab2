@@ -36,8 +36,18 @@ void ID_stage() {
             case 0x19:///multu
                 if(rS[rs] == 3 || rS[rt] == 3) STALLED();
                 break;
-            case 0x08: //ja
-
+            case 0x08: //jr
+                if(rS[rs] == 1)  STALLED();
+                else if(rS[rs] == 3)  STALLED();
+                else if(rS[rs] == 4) {
+                    STALLED();
+                    rS[rs] = 0;
+                }
+                else if(rS[rs] == 2 || rS[rs] == 6) {
+                    EXtoID = rs;
+                    EXtoID_case = 1;
+                    ss = rB[rs];
+                }
             default:
                 break;
         }
@@ -47,6 +57,8 @@ void ID_stage() {
             case 0x2B: //sw
             case 0x29: //sh
             case 0x28: //sb
+                if(rS[rt] == 3 || rS[rs] == 3)  STALLED();
+                break;
             case 0x08: //addi
             case 0x09: //addiu
             case 0x0C: //andi
@@ -73,23 +85,31 @@ void ID_stage() {
                     if(rS[rs] == 2 || rS[rs] == 6) {
                         EXtoID = rs;
                         EXtoID_case = 1;
-                        ss = rB[rs];
+                        ss = rDB[rs];
                     }
                     else {
                         EXtoID = rt;
                         EXtoID_case = 2;
-                        tt = rB[rt];
+                        tt = rDB[rt];
                     }
-                    if(rS[rs] == rS[rt]) EXtoID_case = 3;
+                    if(rS[rs] == rS[rt]) {
+                        EXtoID_case = 3;
+                        ss = rDB[rs];
+                        tt = rDB[rt];
+                    }
                 }
                 break;
             case 0x07: //bgtz
                 if(rS[rs] == 1)  STALLED();
-                if(rS[rs] == 3 || rS[rt] == 3)  STALLED();
-                if(rS[rs] == 2) {
+                else if(rS[rs] == 3)  STALLED();
+                else if(rS[rs] == 4) {
+                    STALLED();
+                    rS[rs] = 0;
+                }
+                else if(rS[rs] == 2 || rS[rs] == 6) {
                     EXtoID = rs;
                     EXtoID_case = 1;
-                    ss = rB[rs];
+                    ss = rDB[rs];
                 }
             default:
                 break;

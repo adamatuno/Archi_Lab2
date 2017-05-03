@@ -1,13 +1,18 @@
 comp = fc
-case1 = my
-case2 = pipeline4
-case3 = pipeline3
-case4 = pipeline2
-case5 = pipeline1
-case6 = mul_or
-case7 = branch
-case8 = func
-case9 = recur
+case1 = 41
+case2 = 42
+case3 = 43
+case4 = 44
+case5 = 45
+case6 = 46
+case7 = 47
+case8 = 48
+case9 = 49
+case10 = 10
+case11 = 20
+case12 = 30
+case13 = 40
+case14 = my
 
 testcases = ../valid_testcase
 pipeline: *.o
@@ -79,4 +84,34 @@ test2: *.o
 	./pipeline
 	$(comp) snapshot.rpt $(testcases)/$(case9)/snapshot.rpt
 	$(comp) error_dump.rpt $(testcases)/$(case9)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case10)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case10)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case10)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case11)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case11)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case11)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case12)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case12)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case12)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case13)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case13)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case13)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case14)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case14)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case14)/error_dump.rpt
+	rm -f *.bin *.rpt
+	cp $(testcases)/$(case1)/*.bin ../simulator
+	./pipeline
+	$(comp) snapshot.rpt $(testcases)/$(case1)/snapshot.rpt
+	$(comp) error_dump.rpt $(testcases)/$(case1)/error_dump.rpt
 	rm -f *.bin *.rpt

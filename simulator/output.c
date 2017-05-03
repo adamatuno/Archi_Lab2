@@ -5,6 +5,7 @@ void cycle_0() {
     int i;
     printReg = -1;
     printHi = printLo = 0;
+    w0_l = w0 = hlo_l = hlo = no_l = no = dmm = dmo = 0;
     messageReset();
     fprintf(sn, "cycle 0\n");
     for(i = 0; i < 32; ++i) fprintf(sn, "$%02d: 0x%08X\n", i, r[i]);
@@ -56,35 +57,37 @@ void snap(int cycle) {
     fprintf(sn, "WB: ");
     printfMIPS(WB);
     fprintf(sn, "\n\n\n");
-    writeError();
     messageReset();
 }
 
 
-void writeError() {
-    if(w0 > 0 && w0B == Cycle) {
-        fprintf(err, "In cycle %d: Write $0 Error\n", w0);
-        w0 = -1;
+void writeError_small() {
+    if(w0_l) {
+        fprintf(err, "In cycle %d: Write $0 Error\n", Cycle);
     }
-    if(hlo > 0 && hloB == Cycle) {
-        fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", hlo);
-        hlo = -1;
+    if(hlo_l) {
+        fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", Cycle);
     }
-    if(dmo > 0 && dmo == Cycle) {
-        fprintf(err, "In cycle %d: Address Overflow\n", dmo);
-        dmo = -1;
+    if(no_l) {
+        fprintf(err, "In cycle %d: Number Overflow\n", Cycle);
     }
-    if(dmm > 0 && dmm == Cycle) {
-        fprintf(err, "In cycle %d: Misalignment Error\n", dmm);
-        dmm = -1;
+    w0_l = w0;
+    hlo_l = hlo;
+    no_l = no;
+    w0 = 0;
+    hlo = 0;
+    no = 0;
+}
+
+void writeError_big() {
+    if(dmo) {
+        fprintf(err, "In cycle %d: Address Overflow\n", Cycle + 1);
+        bigError = 1;
     }
-    if(no > 0 && noB == Cycle) {
-        fprintf(err, "In cycle %d: Number Overflow\n", no);
-        no = -1;
+    if(dmm) {
+        fprintf(err, "In cycle %d: Misalignment Error\n", Cycle + 1);
+        bigError = 1;
     }
-    if(w0 > 0) w0B = w0;
-    if(hlo > 0) hloB = hlo;
-    if(no > 0) noB = no;
 }
 
 void messageReset() {
@@ -107,7 +110,7 @@ void printfIDMessage() {
     fprintf(sn, "\n");
 }
 
-void printfEXMessage() {    int slash = 0;
+void printfEXMessage() {
     if(EXtoEX > -1 && EXtoEX_case == 1) fprintf(sn, " fwd_EX-DM_rs_$%d", EXtoEX);
     if(DMtoEX > -1 && DMtoEX_case == 1) fprintf(sn, " fwd_DM-WB_rs_$%d", DMtoEX);
     if(EXtoEX > -1 && EXtoEX_case == 2) fprintf(sn, " fwd_EX-DM_rt_$%d", EXtoEX);

@@ -7,7 +7,7 @@ int stalled, flushed, EXtoID, EXtoID_case, EXtoEX, EXtoEX_case, DMtoEX, DMtoEX_c
 unsigned int Hi, Hil, HiB, Lo, Lol, LoB, PC, PCin, PCl, D[1024], I[256], iin, din, halt, spin, R31;
 unsigned int IF, ID, EX, DM, WB, IF_next, ID_next, EX_next, DM_next, WB_next, PC_next, mem_addr;
 FILE *ii, *di, *sn, *err;
-int w0, no, hlo, dmo, dmm, hloB, noB, w0B;
+int w0, no, hlo, dmo, dmm, w0_l, no_l, hlo_l, dmo_l, dmm_l;
 //decode
 unsigned int get_op(unsigned int i);
 unsigned int get_rs(unsigned int i);
@@ -45,7 +45,8 @@ void PC_overflow();
 //output
 void cycle_0();
 void snap(int cycle);
-void writeError();
+void writeError_small();
+void writeError_big();
 void messageReset();
 void printfIFMessage();
 void printfIDMessage();

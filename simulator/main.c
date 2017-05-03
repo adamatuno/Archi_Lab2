@@ -21,23 +21,23 @@ void init() {
     PCin = PC = readfile(ii) / 4;
     PCl = PC;
     iin = readfile(ii);
-    for(i = 0; i < 256; ++i) {
-        if(i < PCin + iin && i >= PCin) I[i] = readfile(ii);
+    for (i = 0; i < 256; ++i) {
+        if (i < PCin + iin && i >= PCin) I[i] = readfile(ii);
         else I[i] = 0x00000000;
     }
     r[29] = rl[29] = rB[29] = spin = readfile(di);
     din = readfile(di);
-    for(i = 0; i < din * 4; i += 4) {
+    for (i = 0; i < din * 4; i += 4) {
         word = readfile(di);
         D[i] = word >> 24;
         D[i + 1] = (word >> 16) & 0x000000ff;
         D[i + 2] = (word >> 8) & 0x000000ff;
         D[i + 3] = word & 0x000000ff;
     }
-    for(i = din * 4; i < 1024; ++i) D[i] = 0x00000000;
-    for(i = 0; i < 32; ++i) {
+    for (i = din * 4; i < 1024; ++i) D[i] = 0x00000000;
+    for (i = 0; i < 32; ++i) {
         rS[i] = 0;
-        if(i != 29) r[i] = rl[i] = rB[i] = rDB[i] = 0x00000000;
+        if (i != 29) r[i] = rl[i] = rB[i] = rDB[i] = 0x00000000;
     }
     Hi = Hil = 0x00000000;
     Lo = Lol = 0x00000000;
@@ -53,30 +53,37 @@ void next() {
     DM = DM_next;
     WB = WB_next;
     PC = PC_next;
-    ++Cycle;
-    if(bigError) BIGERROR = 1;
 }
 
 int checkHalt() {
-    if(IF == 0xffffffff && ID == 0xffffffff && EX == 0xffffffff && DM == 0xffffffff && WB == 0xffffffff || BIGERROR)  return 1;
+    if (get_op(IF) == 0x3f && get_op(ID) == 0x3f && get_op(EX) == 0x3f && get_op(DM) == 0x3f && get_op(WB) == 0x3f)  return 1;
     else return 0;        
 }
 
-int main(){
-    int i;
+void halt_Error() {
+    Cycle++;
+    if(w0_l) fprintf(err, "In cycle %d: Write $0 Error\n", Cycle);
+    Cycle--;
+    writeError_big();
+    Cycle++;
+    if(hlo_l) fprintf(err, "In cycle %d: Overwrite HI-LO registers\n", Cycle);
+    if(no_l) fprintf(err, "In cycle %d: Number Overflow\n", Cycle);
+}
+
+int main() {
     init();
     cycle_0();
-    Cycle = 0;
-    while(Cycle <= 500000) {
+    for (Cycle = 0; Cycle <= 500000; ++Cycle) {
         WB_stage();
         DM_stage();
         EX_stage();
         ID_stage();
         IF_stage();
         snap(Cycle);
-        if(checkHalt()) break;
+        writeError_small();
+        if (checkHalt() || bigError) break;
         next();
     }
+    halt_Error();
 return 0;
 }
-

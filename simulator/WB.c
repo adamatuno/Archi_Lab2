@@ -12,10 +12,14 @@ void WB_stage() {
         rd = get_rd(WB);
         switch(fun) {
             case 0x00:
-                if(rt == 0 && rd == 0 && get_sha(ID) == 0) break; //nop
+                if(rt == 0 && rd == 0 && get_sha(WB) == 0) break; //nop
                 else { //sll
-                    rS[rd] = 0;
-                    r[rd] = rB[rd];
+                    write_0(rd);
+                    if(rS[rd] == 6) {
+                        rS[rd] = 2; 
+                        WBchange = rd;
+                    }
+                    r[rd] = rDB[rd];
                     break;
                 }
             case 0x20: //add
@@ -31,6 +35,7 @@ void WB_stage() {
             case 0x03: //sra
             case 0x10: //mfhi
             case 0x12: //mflo
+                write_0(rd);
                 if(rS[rd] == 6) {
                     rS[rd] = 2; 
                     WBchange = rd;
@@ -45,15 +50,12 @@ void WB_stage() {
         rs = get_rs(WB);
         rt = get_rt(WB);
         switch(op) {
-            case 0x2B: //sw
-            case 0x29: //sh
-            case 0x28: //sb
-                break;
             case 0x23: //lw
             case 0x21: //lh
             case 0x25: //lhu
             case 0x20: //lb
             case 0x24: //lbu
+                write_0(rt);
                 if(rS[rt] == 6) {
                     rS[rt] = 2;
                     WBchange = rt;
@@ -70,6 +72,7 @@ void WB_stage() {
             case 0x0E: //nori
             case 0x0A: //slti
             case 0x0F: //lui
+                write_0(rt);
                 if(rS[rt] == 6) {
                     rS[rt] = 2;
                     WBchange = rt;
@@ -79,6 +82,9 @@ void WB_stage() {
                 }
                 r[rt] = rDB[rt];
                 break;
+            case 0x2B: //sw
+            case 0x29: //sh
+            case 0x28: //sb
             case 0x04: //beq
             case 0x05: //bne
             case 0x07: //bgtz
